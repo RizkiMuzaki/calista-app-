@@ -38,10 +38,10 @@
 
 
 ## 🟢 VOICE AI OPTIMIZATION (COMPLETED)
-- [x] Synchronize Laravel controller ports to port 5003
-- [x] Implement FallbackTTS in voiceagent.py (Typecast -> EdgeTTS)
-- [x] Implement `/api/writing` aliases in voiceagent.py
-- [x] Optimize pre-fetching & cache validation for questions & choices
+- [x] (LEGACY) Synchronize Laravel controller ports to port 5003 -> Dihentikan, bermigrasi ke ElevenLabs native.
+- [x] (LEGACY) Implement FallbackTTS in voiceagent.py (Typecast -> EdgeTTS) -> Dihentikan.
+- [x] (LEGACY) Implement `/api/writing` aliases in voiceagent.py -> Dihentikan.
+- [x] Optimize pre-fetching & cache validation for questions & choices (ElevenLabs Native).
 
 ---
 *Status Update: 31 May 2026 - Voice AI Optimization & Mismatched Ports Fix.*
