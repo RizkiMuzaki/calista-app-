@@ -60,13 +60,13 @@ class StoryApiController extends Controller
                     'rating' => (double) $story->rating,
                     'age_group' => $story->age_group,
                     'duration' => $story->duration,
-                    'is_premium' => (bool) $story->is_premium,
+                    'is_premium' => false, // Bypassed: force false for testing
                     'order' => (int) $story->order,
                     'cover_url' => $coverUrl,
                     'user_progress' => $progress,
                 ];
             });
-
+ 
             return response()->json([
                 'success' => true,
                 'message' => 'Daftar dongeng berhasil diambil',
@@ -80,7 +80,7 @@ class StoryApiController extends Controller
             ], 500);
         }
     }
-
+ 
     /**
      * Get detailed story segments (pages) and full media assets
      */
@@ -91,8 +91,9 @@ class StoryApiController extends Controller
             $story = Story::where('slug', $slug)
                 ->where('is_active', true)
                 ->firstOrFail();
-
-            // Lock premium stories for non-subscribers
+ 
+            // Lock premium stories for non-subscribers (Bypassed for testing)
+            /*
             if ($story->is_premium) {
                 if (!$user || !$user->hasActiveSubscription()) {
                     return response()->json([
@@ -101,14 +102,15 @@ class StoryApiController extends Controller
                     ], 403);
                 }
             }
-
+            */
+ 
             // Resolve assets
             $coverUrl = $this->resolveMediaUrl($story->getFirstMediaUrl('cover'));
             $narrationUrl = $this->resolveMediaUrl($story->getFirstMediaUrl('full_narration'));
             $animationUrl = $this->resolveMediaUrl($story->getFirstMediaUrl('full_animation'));
-
+ 
             // Load pages logic removed - using full_script instead
-
+ 
             // Get progress
             $progress = null;
             if ($user) {
@@ -123,7 +125,7 @@ class StoryApiController extends Controller
                     ];
                 }
             }
-
+ 
             return response()->json([
                 'success' => true,
                 'message' => 'Detail dongeng berhasil diambil',
@@ -135,7 +137,7 @@ class StoryApiController extends Controller
                     'rating' => (double) $story->rating,
                     'age_group' => $story->age_group,
                     'duration' => $story->duration,
-                    'is_premium' => (bool) $story->is_premium,
+                    'is_premium' => false, // Bypassed: force false for testing
                     'full_script' => $story->full_script,
                     'cover_url' => $coverUrl,
                     'narration_url' => $narrationUrl,
