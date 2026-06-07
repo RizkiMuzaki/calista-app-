@@ -14,8 +14,10 @@ class Module extends Model
         return $this->hasMany(Level::class);
     }
 
-    public function books()
+
+
+    public function playSessions()
     {
-        return $this->hasMany(Book::class);
+        return $this->hasMany(PlaySession::class);
     }
 }

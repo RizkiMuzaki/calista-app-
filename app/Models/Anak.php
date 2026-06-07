@@ -5,6 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $nama_anak
+ * @property \Carbon\Carbon $tanggal_lahir
+ * @property bool $is_active
+ * @property int $limit_detik
+ * @property int $sisa_detik
+ * @property \Carbon\Carbon $tanggal_reset
+ * @property \Carbon\Carbon|null $timer_started_at
+ * @property \Carbon\Carbon|null $timer_last_updated
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
 class Anak extends Model
 {
     protected $table = 'anaks';
@@ -12,7 +26,11 @@ class Anak extends Model
     protected $fillable = [
         'user_id',
         'nama_anak',
+        'rename_count',
         'tanggal_lahir',
+        'jenis_kelamin',
+        'avatar_path',
+        'background_path',
         'is_active',
         'limit_detik',
         'sisa_detik',
@@ -27,6 +45,7 @@ class Anak extends Model
         'is_active' => 'boolean',
         'timer_started_at' => 'datetime',
         'timer_last_updated' => 'datetime',
+        'rename_count' => 'integer',
     ];
 
     public function user()
@@ -37,6 +56,19 @@ class Anak extends Model
     public function progresAnaks()
     {
         return $this->hasMany(ProgresAnak::class);
+    }
+
+    public function playSessions()
+    {
+        return $this->hasMany(PlaySession::class);
+    }
+
+    /**
+     * Baju yang dimiliki anak (wardrobe/lemari baju).
+     */
+    public function childItems()
+    {
+        return $this->hasMany(ChildItem::class, 'anak_id');
     }
 
     /**
@@ -86,6 +118,10 @@ class Anak extends Model
             
             $this->sisa_detik = $newRemaining;
             $this->timer_last_updated = $now;
+            if ($newRemaining <= 0) {
+                $this->timer_started_at = null;
+                $this->timer_last_updated = null;
+            }
             $this->save();
         }
         
@@ -194,15 +230,29 @@ class Anak extends Model
      */
     public function getProgressByType($type)
     {
-        $total = $this->progresAnaks()
-            ->count();
-        
+        $slugMap = [
+            'reading' => 'membaca',
+            'writing' => 'menulis',
+            'counting' => 'berhitung',
+        ];
+        $slug = $slugMap[$type] ?? $type;
+
+        $module = Module::where('slug', $slug)->withCount('levels')->first();
+        $total = $module?->levels_count ?? 0;
+
         $completed = $this->progresAnaks()
+            ->whereHas('level.module', function ($query) use ($slug) {
+                $query->where('slug', $slug);
+            })
             ->where('selesai', true)
             ->count();
 
         $percentage = $total > 0 ? ($completed / $total) * 100 : 0;
         $avgScore = $this->progresAnaks()
+            ->whereHas('level.module', function ($query) use ($slug) {
+                $query->where('slug', $slug);
+            })
+            ->where('selesai', true)
             ->avg('score') ?? 0;
 
         return [
@@ -224,6 +274,7 @@ class Anak extends Model
             'reading' => $this->getProgressByType('reading'),
             'counting' => $this->getProgressByType('counting'),
             'writing' => $this->getProgressByType('writing'),
+            'puzzle' => $this->getProgressByType('puzzle'),
         ];
     }
 
@@ -236,12 +287,7 @@ class Anak extends Model
         $moduleProgress = [];
 
         foreach ($modules as $module) {
-            // Ambil semua level yang ada progress di module ini
-            $total = $this->progresAnaks()
-                ->whereHas('level', function ($q) use ($module) {
-                    $q->where('module_id', $module->id);
-                })
-                ->count();
+            $total = $module->levels()->count();
             
             $completed = $this->progresAnaks()
                 ->whereHas('level', function ($q) use ($module) {
@@ -250,14 +296,12 @@ class Anak extends Model
                 ->where('selesai', true)
                 ->count();
 
-            if ($total > 0) {
-                $moduleProgress[] = [
-                    'module' => $module->name,
-                    'completed' => $completed,
-                    'total' => $total,
-                    'percentage' => round(($completed / $total) * 100, 1)
-                ];
-            }
+            $moduleProgress[] = [
+                'module' => $module->name,
+                'completed' => $completed,
+                'total' => $total,
+                'percentage' => $total > 0 ? round(($completed / $total) * 100, 1) : 0
+            ];
         }
 
         return $moduleProgress;

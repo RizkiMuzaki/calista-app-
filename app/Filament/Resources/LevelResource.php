@@ -38,32 +38,55 @@ class LevelResource extends Resource
                     ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
                         $moduleId = $get('module_id');
                         if ($moduleId) {
-                            // Ambil level terakhir di module ini
                             $lastLevel = Level::where('module_id', $moduleId)
                                 ->orderBy('order_number', 'desc')
                                 ->first();
                             
                             if ($lastLevel) {
-                                // Set order_number ke order_number terakhir + 1
                                 $nextOrderNumber = $lastLevel->order_number + 1;
                                 $set('order_number', $nextOrderNumber);
-                                
-                                // Set title otomatis: "Level {nextOrderNumber}"
                                 $set('title', "Level {$nextOrderNumber}");
                             } else {
-                                // Jika belum ada level, mulai dari 1
                                 $set('order_number', 1);
                                 $set('title', 'Level 1');
                             }
                         }
                     }),
+                Forms\Components\Select::make('activity_type')
+                    ->label('Tipe Aktivitas')
+                    ->options([
+                        'reading' => '📖 Membaca',
+                        'writing' => '✍️ Menulis',
+                        'counting' => '🔢 Berhitung',
+                        'puzzle' => '🧩 Puzzle',
+                    ])
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set) {
+                        $moduleId = $get('module_id');
+                        $activityType = $get('activity_type');
+                        $orderNumber = $get('order_number');
+                        if ($moduleId && $activityType && $orderNumber) {
+                            $module = \App\Models\Module::find($moduleId);
+                            if ($module) {
+                                $set('local_level_id', "{$activityType}-{$module->slug}-{$orderNumber}");
+                            }
+                        }
+                    }),
                 Forms\Components\TextInput::make('order_number')
+                    ->label('Level Ke')
                     ->required()
                     ->numeric()
                     ->readOnly(),
                 Forms\Components\TextInput::make('title')
+                    ->label('Judul Level')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('local_level_id')
+                    ->label('Local Level ID (Flutter)')
+                    ->required()
+                    ->maxLength(255)
+                    ->helperText('Format: [tipe_aktivitas]-[slug_modul]-[level_ke], Contoh: reading-zoo-1'),
             ]);
     }
 
@@ -72,15 +95,34 @@ class LevelResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')->label('ID')->sortable(),
-                TextColumn::make('module.name')->label('Module')->sortable()->searchable(),
-                TextColumn::make('order_number')->label('Order')->sortable(),
-                TextColumn::make('title')->label('Title')->sortable()->searchable(),
-                TextColumn::make('writing_items_count')->label('Items')->sortable(),
-                TextColumn::make('created_at')->label('Created')->dateTime()->sortable(),
+                TextColumn::make('module.name')->label('Module / Chapter')->sortable()->searchable(),
+                TextColumn::make('activity_type')
+                    ->label('Tipe Aktivitas')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'reading' => '📖 Membaca',
+                        'writing' => '✍️ Menulis',
+                        'counting' => '🔢 Berhitung',
+                        'puzzle' => '🧩 Puzzle',
+                        default => $state,
+                    })
+                    ->color(fn ($state) => match ($state) {
+                        'reading' => 'success',
+                        'writing' => 'info',
+                        'counting' => 'warning',
+                        'puzzle' => 'danger',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+                TextColumn::make('order_number')->label('Level Ke')->sortable(),
+                TextColumn::make('title')->label('Judul Level')->sortable()->searchable(),
+                TextColumn::make('local_level_id')->label('Local Level ID (Flutter)')->sortable()->searchable(),
+                TextColumn::make('created_at')->label('Dibuat')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
+            ->paginated([10])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -109,6 +151,6 @@ class LevelResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('module')->withCount('writingItems');
+        return parent::getEloquentQuery()->with('module');
     }
 }

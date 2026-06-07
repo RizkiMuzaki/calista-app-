@@ -7,37 +7,40 @@ use Illuminate\Support\Facades\DB;
 
 class PlanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $plans = [
             [
-                'nama_paket' => '1 Bulan',
-                'durasi_bulan' => 1,
-                'harga_jual' => 91000,
-                'deskripsi' => "🎒 Paket CALISTA 1 Bulan — Belajar Calistung bersama AI\n
-📅 Durasi: 30 hari\n
-🤖 Akses AI Interaktif untuk belajar membaca, menulis, dan berhitung\n
-🔤 Materi dasar: Pengenalan huruf & angka\n
-🧠 Latihan adaptif sesuai kemampuan anak\n
-👶 Cocok untuk anak usia 5–10 tahun",
+                'nama_paket' => 'Calista Edu Plan Mingguan',
+                'durasi_bulan' => 0,
+                'harga_jual' => 26000,
+                'deskripsi' => "Paket coba 7 hari untuk membuka wardrobe premium Nusa, gift Nusa Elephant Ranger, dan laporan progress dasar.",
             ],
             [
-                'nama_paket' => '3 Bulan',
-                'durasi_bulan' => 3,
-                'harga_jual' => 273000,
-                'deskripsi' => "🌟 Paket CALISTA 3 Bulan — Solusi belajar konsisten dan hemat\n
-📅 Durasi: 90 hari\n
-🤖 Akses AI Interaktif tanpa batas\n
-🔤 Materi lengkap calistung dasar\n
-📊 Evaluasi perkembangan belajar anak\n
-🎮 Pembelajaran interaktif & menyenangkan\n
-👶 Direkomendasikan untuk anak usia 5–10 tahun",
+                'nama_paket' => 'Calista Plus Bulanan',
+                'durasi_bulan' => 1,
+                'harga_jual' => 130000,
+                'deskripsi' => "Paket fleksibel keluarga aktif: semua benefit Mingguan, wardrobe premium penuh, dan insight perkembangan anak lebih lengkap.",
+            ],
+            [
+                'nama_paket' => 'Calista Plus Tahunan',
+                'durasi_bulan' => 12,
+                'harga_jual' => 866000,
+                'deskripsi' => "Paket 12 bulan penuh untuk belajar stabil, akses premium panjang, dan prioritas fitur Nusa terbaru.",
             ],
         ];
 
-        DB::table('plans')->insert($plans);
+        foreach ($plans as $plan) {
+            DB::table('plans')->updateOrInsert(
+                ['nama_paket' => $plan['nama_paket']],
+                [
+                    'durasi_bulan' => $plan['durasi_bulan'],
+                    'harga_jual' => $plan['harga_jual'],
+                    'deskripsi' => $plan['deskripsi'],
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        }
     }
 }

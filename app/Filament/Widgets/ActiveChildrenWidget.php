@@ -68,23 +68,35 @@ class ActiveChildrenWidget extends BaseWidget
         return [
             Stat::make('Total Anak', Number::format($totalAnak))
                 ->description('Seluruh anak terdaftar')
-                ->descriptionIcon('heroicon-o-user')
-                ->color('primary'),
+                ->descriptionIcon('heroicon-m-user')
+                ->color('primary')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #3b82f6 !important; background: rgba(59, 130, 246, 0.04) !important;',
+                ]),
 
             Stat::make('Anak Aktif', Number::format($activeAnak))
                 ->description('Status aktif')
-                ->descriptionIcon('heroicon-o-check-circle')
-                ->color('success'),
+                ->descriptionIcon('heroicon-m-check-circle')
+                ->color('success')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #10b981 !important; background: rgba(16, 185, 129, 0.04) !important;',
+                ]),
 
             Stat::make('Waktu Tersisa', Number::format($anakWithTimeRemaining))
                 ->description("Rata-rata: {$formattedAverageTime}")
-                ->descriptionIcon('heroicon-o-clock')
-                ->color('info'),
+                ->descriptionIcon('heroicon-m-clock')
+                ->color('info')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #06b6d4 !important; background: rgba(6, 182, 212, 0.04) !important;',
+                ]),
 
             Stat::make('Timer Berjalan', Number::format($anakWithRunningTimer))
                 ->description("Total waktu: {$formattedTotalTime}")
-                ->descriptionIcon('heroicon-o-play-circle')
-                ->color('warning'),
+                ->descriptionIcon('heroicon-m-play-circle')
+                ->color('warning')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #f59e0b !important; background: rgba(245, 158, 11, 0.04) !important;',
+                ]),
         ];
     }
 

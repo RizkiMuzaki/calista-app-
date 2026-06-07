@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'parent_pin',
     ];
 
     /**
@@ -31,6 +32,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'parent_pin',
         'remember_token',
     ];
 
@@ -150,8 +152,4 @@ class User extends Authenticatable
 
   
     
-    public function artikel()
-    {
-        return $this->hasMany(Artikel::class);
-    }
 }

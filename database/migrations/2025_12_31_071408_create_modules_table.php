@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('foto');
             $table->string('name', 30);      // Menulis, Membaca, Menghitung
-            $table->enum('type', ['level', 'buku']); // 👈 jenis modul            $table->string('slug')->unique();
+            $table->enum('type', ['level', 'buku']); // jenis modul
+            $table->string('slug')->unique();
             $table->timestamps();
         });
     }

@@ -16,6 +16,8 @@ class UserStatsWidget extends BaseWidget
 
     protected static ?int $sort = 2;
     
+    protected ?string $heading = 'Statistik Pengguna & Langganan';
+    
     protected int | string | array $columnSpan = [
         'md' => 2,
         'xl' => 3,
@@ -63,24 +65,27 @@ class UserStatsWidget extends BaseWidget
         return [
             Stat::make('Total Pengguna', Number::format($totalUsers))
                 ->description('Seluruh pengguna terdaftar')
-                ->descriptionIcon('heroicon-o-user-group')
+                ->descriptionIcon('heroicon-m-user-group')
                 ->color('primary')
-                ->chart([5, 3, 10, 15, 12, 20, 25])
                 ->extraAttributes([
-                    'class' => 'cursor-pointer',
+                    'style' => 'border-top: 4px solid #3b82f6 !important; background: rgba(59, 130, 246, 0.04) !important;',
                 ]),
 
             Stat::make('Pengguna Berlangganan', Number::format($usersWithSubscriptions))
                 ->description('Memiliki riwayat langganan')
-                ->descriptionIcon('heroicon-o-credit-card')
-                ->color('success'),
+                ->descriptionIcon('heroicon-m-credit-card')
+                ->color('success')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #10b981 !important; background: rgba(16, 185, 129, 0.04) !important;',
+                ]),
 
             Stat::make('Langganan Aktif', Number::format($activeSubscriptions))
                 ->description('Status aktif & belum berakhir')
-                ->descriptionIcon('heroicon-o-check-badge')
-                ->color('warning'),
-
-
+                ->descriptionIcon('heroicon-m-check-badge')
+                ->color('warning')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #f59e0b !important; background: rgba(245, 158, 11, 0.04) !important;',
+                ]),
         ];
     }
 }

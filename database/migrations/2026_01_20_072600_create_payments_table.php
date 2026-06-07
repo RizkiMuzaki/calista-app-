@@ -24,8 +24,9 @@ return new class extends Migration
             $table->text('pay_url')->nullable();
             $table->text('checkout_url');
             $table->enum('status', ['UNPAID', 'PAID', 'EXPIRED', 'FAILED'])->default('UNPAID');
-            $table->timestamp('expired_time');
-            $table->timestamps();            $table->index(['reference', 'merchant_ref']);
+            $table->timestamp('expired_time')->nullable();
+            $table->timestamps();
+            $table->index(['merchant_ref']); // Only index existing columns
         });
     }
 

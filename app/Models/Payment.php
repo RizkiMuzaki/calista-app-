@@ -14,6 +14,10 @@ class Payment extends Model
     protected $fillable = [
         'user_id',
         'plan_id',
+        'provider',
+        'provider_transaction_id',
+        'provider_subscription_id',
+        'provider_payload',
         'reference',
         'merchant_ref',
         'payment_method',
@@ -37,6 +41,7 @@ class Payment extends Model
         'total_fee' => 'integer',
         'amount_received' => 'integer',
         'expired_time' => 'datetime',
+        'provider_payload' => 'array',
     ];
 
     // Scope untuk payment yang masih aktif

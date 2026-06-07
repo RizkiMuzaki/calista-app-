@@ -50,33 +50,41 @@ class ModuleStatsWidget extends BaseWidget
             ->get()
             ->sum('levels_count');
 
-        // Total books dari semua module
-        $totalBooks = Module::withCount('books')
-            ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
-            ->get()
-            ->sum('books_count');
+        // Total stories
+        $totalStories = \App\Models\Story::count();
 
         return [
             Stat::make('Total Module', Number::format($totalModules))
                 ->description('Seluruh modul pembelajaran')
-                ->descriptionIcon('heroicon-o-cube')
-                ->color('primary'),
+                ->descriptionIcon('heroicon-m-cube')
+                ->color('primary')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #3b82f6 !important; background: rgba(59, 130, 246, 0.04) !important;',
+                ]),
 
             Stat::make('Jenis Module', count($types))
                 ->description('Variasi tipe module')
-                ->descriptionIcon('heroicon-o-square-3-stack-3d')
-                ->color('info'),
+                ->descriptionIcon('heroicon-m-square-3-stack-3d')
+                ->color('info')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #06b6d4 !important; background: rgba(6, 182, 212, 0.04) !important;',
+                ]),
 
             Stat::make('Total Level', Number::format($totalLevels))
                 ->description('Level dari semua module')
-                ->descriptionIcon('heroicon-o-chart-bar')
-                ->color('success'),
+                ->descriptionIcon('heroicon-m-chart-bar')
+                ->color('success')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #10b981 !important; background: rgba(16, 185, 129, 0.04) !important;',
+                ]),
 
-            Stat::make('Total Buku', Number::format($totalBooks))
-                ->description('Buku dari semua module')
-                ->descriptionIcon('heroicon-o-book-open')
-                ->color('warning'),
+            Stat::make('Total Dongeng', Number::format($totalStories))
+                ->description('Koleksi dongeng premium')
+                ->descriptionIcon('heroicon-m-book-open')
+                ->color('warning')
+                ->extraAttributes([
+                    'style' => 'border-top: 4px solid #f59e0b !important; background: rgba(245, 158, 11, 0.04) !important;',
+                ]),
         ];
     }
 }

@@ -4,6 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $anak_id
+ * @property int $level_id
+ * @property int $score
+ * @property int $bintang
+ * @property bool $selesai
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
 class ProgresAnak extends Model
 {
     protected $table = 'progres_anaks';
@@ -12,12 +22,22 @@ class ProgresAnak extends Model
         'anak_id',
         'level_id',
         'score',
+        'current_score',
         'bintang',
         'selesai',
+        'current_item',
+        'total_items',
+        'mistakes',
+        'lives_remaining',
+        'duration_seconds',
+        'last_played_at',
+        'metadata',
     ];
 
     protected $casts = [
         'selesai' => 'boolean',
+        'last_played_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
     public function anak()

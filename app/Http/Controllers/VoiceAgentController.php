@@ -2,463 +2,377 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Module;
-use App\Models\User;
-use App\Models\Anak;
+use App\Services\AiCreditService;
+use App\Services\ElevenLabsTtsService;
+use App\Services\GroqAiService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class VoiceAgentController extends Controller
 {
-    private $pythonBaseUrl = 'http://76.13.21.74:5003';
-    
-    /**
-     * Halaman utama voice agent
-     */
+    public function __construct(
+        private GroqAiService $groq,
+        private ElevenLabsTtsService $tts,
+        private AiCreditService $credits,
+    ) {
+    }
+
     public function index(Request $request)
     {
         $user = auth()->user();
-        $activeAnak = $user->anaks()->where('is_active', true)->first();
-        
+        $activeAnak = $user?->anaks()->where('is_active', true)->first();
+
         $modules = Module::where('type', 'voice_chat')
             ->orWhere('slug', 'LIKE', 'voice-%')
             ->orderBy('order_number')
             ->get();
-        
+
         return view('pages.voice-agent.index', compact('modules', 'activeAnak'));
     }
-    
-    /**
-     * Halaman voice chat interaktif
-     */
+
     public function voiceChat(Request $request, $slug = null)
     {
         $user = auth()->user();
-        $activeAnak = $user->anaks()->where('is_active', true)->first();
-        
-        $module = null;
-        if ($slug) {
-            $module = Module::where('slug', $slug)->first();
-        }
-        
-        // Generate session ID
-        $sessionId = 'voice_' . ($slug ?? 'general') . '_' . $user->id . '_' . now()->timestamp;
+        $activeAnak = $user?->anaks()->where('is_active', true)->first();
+        $module = $slug ? Module::where('slug', $slug)->first() : null;
+        $sessionId = 'voice_' . ($slug ?? 'general') . '_' . ($user?->id ?? 'guest') . '_' . now()->timestamp;
+
         session(['voice_session_id' => $sessionId]);
-        
+
         return view('pages.voice-agent.chat', compact('module', 'activeAnak', 'sessionId'));
     }
-    
-    /**
-     * Proses audio melalui full pipeline - DIPERBAIKI
-     */
+
     public function processVoice(Request $request)
     {
+        $validated = $request->validate([
+            'audio' => 'required|file|mimes:wav,mp3,ogg,m4a,webm|max:5120',
+            'age_group' => 'nullable|string|in:3-5,5-7,7-9,9-12',
+            'child_name' => 'nullable|string|max:80',
+            'module_slug' => 'nullable|string|max:80',
+            'module_title' => 'nullable|string|max:120',
+            'level_title' => 'nullable|string|max:120',
+            'expected_answer' => 'nullable|string|max:120',
+            'learning_instruction' => 'nullable|string|max:255',
+            'learning_hint' => 'nullable|string|max:255',
+        ]);
+
         try {
-            $request->validate([
-                'audio' => 'required|file|mimes:wav,mp3,ogg,m4a,webm|max:5120',
-                'age_group' => 'nullable|string|in:3-5,5-7,7-9,9-12',
-                'user_id' => 'nullable|string'
-            ]);
-            
+            $user = auth()->user();
+            $ageGroup = $validated['age_group'] ?? '3-5';
             $audioFile = $request->file('audio');
-            $ageGroup = $request->age_group ?? '5-7';
-            $userId = $request->user_id ?? 'user_' . auth()->id();
-            
-            // Simpan file sementara untuk debugging
-            $tempPath = storage_path('app/temp/' . uniqid() . '_' . $audioFile->getClientOriginalName());
-            $audioFile->move(dirname($tempPath), basename($tempPath));
-            
-            \Log::info("Audio file saved to: $tempPath, Size: " . filesize($tempPath));
-            
-            // Kirim ke Python server - DIPERBAIKI
-            $response = Http::timeout(120)->attach(
-                'audio', 
-                file_get_contents($tempPath),
-                $audioFile->getClientOriginalName()
-            )->post("{$this->pythonBaseUrl}/api/voice_chat", [
+            $userText = $this->groq->transcribe($audioFile, 'id');
+
+            if ($userText === '') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nusa belum mendengar suaramu. Coba bicara pelan-pelan ya.',
+                    'user_text' => '',
+                ], 422);
+            }
+
+            $context = $this->contextFromRequest($request, $ageGroup);
+            $context['history'] = $this->historyFor($user?->id);
+            $aiResponse = $this->groq->chat($userText, $context);
+            $audio = $this->tts->synthesize($aiResponse, $user, 'voice_chat');
+
+            $this->saveToHistory($user?->id, [
+                'user_text' => $userText,
+                'ai_response' => $aiResponse,
                 'age_group' => $ageGroup,
-                'user_id' => $userId
+                'timestamp' => now()->toDateTimeString(),
             ]);
-            
-            // Hapus file temp
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
+
+            if (!$audio['success']) {
+                return $this->creditFallback($aiResponse, $userText, $audio);
             }
-            
-            if ($response->successful()) {
-                // Get response headers
-                $headers = $response->headers();
-                $userText = $headers['X-STT-Text'][0] ?? 'Teks tidak terdeteksi';
-                $aiResponse = $headers['X-AI-Response'][0] ?? 'Respons AI tidak tersedia';
-                
-                // Simpan ke history
-                $this->saveToHistory(auth()->id(), [
-                    'user_text' => $userText,
-                    'ai_response' => $aiResponse,
-                    'age_group' => $ageGroup,
-                    'timestamp' => now()->toDateTimeString()
-                ]);
-                
-                // Return audio response
-                return response($response->body())
-                    ->header('Content-Type', 'audio/mpeg')
-                    ->header('Cache-Control', 'no-cache, no-store')
-                    ->header('X-STT-Text', $userText)
-                    ->header('X-AI-Response', $aiResponse)
-                    ->header('X-Age-Group', $ageGroup)
-                    ->header('Access-Control-Expose-Headers', 'X-STT-Text,X-AI-Response,X-Age-Group');
-            }
-            
-            // Log error response
-            \Log::error('Python server response failed', [
-                'status' => $response->status(),
-                'body' => $response->body()
-            ]);
-            
-            // Fallback: generate error message audio
-            return $this->generateFallbackAudio("Maaf, server tidak merespons. Coba lagi nanti ya!");
-            
-        } catch (\Exception $e) {
-            \Log::error('Voice processing error: ' . $e->getMessage());
-            return $this->generateFallbackAudio("Maaf, terjadi kesalahan. Coba lagi ya!");
+
+            return response($audio['audio'])
+                ->header('Content-Type', $audio['content_type'])
+                ->header('Cache-Control', 'no-cache, no-store')
+                ->header('X-STT-Text', $this->safeHeader($userText))
+                ->header('X-AI-Response', $this->safeHeader($aiResponse))
+                ->header('X-Age-Group', $ageGroup)
+                ->header('X-AI-Plan', $audio['credit']['plan'] ?? 'free')
+                ->header('X-AI-Credits-Remaining', (string) ($audio['credit']['remaining'] ?? 0))
+                ->header('Access-Control-Expose-Headers', 'X-STT-Text,X-AI-Response,X-Age-Group,X-AI-Plan,X-AI-Credits-Remaining');
+        } catch (\Throwable $e) {
+            Log::error('Nusa voice pipeline failed', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Nusa sedang susah bicara. Coba lagi sebentar ya.',
+                'diagnostic' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
         }
     }
-    
-    /**
-     * Text to Speech - DIPERBAIKI
-     */
+
+    public function assessReading(Request $request)
+    {
+        $validated = $request->validate([
+            'audio' => 'required|file|mimes:wav,mp3,ogg,m4a,webm|max:5120',
+            'target_text' => 'required|string|max:80',
+            'age_group' => 'nullable|string|in:3-5,5-7,7-9,9-12',
+        ]);
+
+        try {
+            $heardText = $this->groq->transcribe($request->file('audio'), 'id');
+            $targetText = (string) $validated['target_text'];
+            $heard = $this->normalizeReadingText($heardText);
+            $target = $this->normalizeReadingText($targetText);
+            $isCorrect = $heard !== '' && $target !== '' && ($heard === $target || str_contains($heard, $target));
+
+            return response()->json([
+                'success' => true,
+                'is_correct' => $isCorrect,
+                'heard_text' => $heardText,
+                'target_text' => $targetText,
+                'score' => $isCorrect ? 100 : 0,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Reading assessment failed', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Nusa belum dapat memeriksa bacaanmu.',
+            ], 500);
+        }
+    }
+
     public function textToSpeech(Request $request)
     {
+        $validated = $request->validate([
+            'text' => 'required|string|max:900',
+            'age_group' => 'nullable|string|in:3-5,5-7,7-9,9-12',
+            'feature' => 'nullable|string|max:48',
+        ]);
+
         try {
-            $request->validate([
-                'text' => 'required|string',
-                'age_group' => 'nullable|string|in:3-5,5-7,7-9,9-12'
-            ]);
-            
-            $text = $request->text;
-            $ageGroup = $request->age_group ?? '5-7';
-            
-            // Kirim ke Python server
-            $response = Http::post("{$this->pythonBaseUrl}/api/tts", [
-                'text' => $text,
-                'age_group' => $ageGroup
-            ]);
-            
-            if ($response->successful()) {
-                return response($response->body())
-                    ->header('Content-Type', 'audio/mpeg')
-                    ->header('Cache-Control', 'no-cache');
+            $audio = $this->tts->synthesize(
+                $validated['text'],
+                auth()->user(),
+                $validated['feature'] ?? 'direct_tts'
+            );
+
+            if (!$audio['success']) {
+                return $this->creditFallback($validated['text'], '', $audio);
             }
-            
-            // Fallback menggunakan browser TTS
+
+            return response($audio['audio'])
+                ->header('Content-Type', $audio['content_type'])
+                ->header('Cache-Control', 'public, max-age=31536000')
+                ->header('X-Calista-TTS-Source', 'elevenlabs')
+                ->header('X-AI-Plan', $audio['credit']['plan'] ?? 'free')
+                ->header('X-AI-Credits-Remaining', (string) ($audio['credit']['remaining'] ?? 0))
+                ->header('Access-Control-Expose-Headers', 'X-Calista-TTS-Source,X-AI-Plan,X-AI-Credits-Remaining');
+        } catch (\Throwable $e) {
+            Log::error('ElevenLabs direct TTS failed', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Server tidak merespons, menggunakan browser TTS',
-                'text' => $text,
-                'age_group' => $ageGroup
-            ]);
-            
-        } catch (\Exception $e) {
-            \Log::error('TTS error: ' . $e->getMessage());
-            return response()->json(['error' => 'Gagal membuat suara: ' . $e->getMessage()], 500);
+                'message' => 'Suara Nusa belum siap. Coba lagi sebentar ya.',
+                'diagnostic' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
         }
     }
-    
-    /**
-     * Speech to Text - DIPERBAIKI
-     */
+
     public function speechToText(Request $request)
     {
+        $request->validate([
+            'audio' => 'required|file|mimes:wav,mp3,ogg,m4a,webm|max:5120',
+        ]);
+
         try {
-            $request->validate([
-                'audio' => 'required|file|mimes:wav,mp3,ogg,webm|max:5120'
+            $text = $this->groq->transcribe($request->file('audio'), 'id');
+
+            return response()->json([
+                'success' => true,
+                'text' => $text,
+                'engine' => 'groq-whisper',
             ]);
-            
-            $audioFile = $request->file('audio');
-            
-            // Kirim ke Python server
-            $response = Http::attach(
-                'audio', 
-                file_get_contents($audioFile->path()), 
-                $audioFile->getClientOriginalName()
-            )->post("{$this->pythonBaseUrl}/api/stt");
-            
-            if ($response->successful()) {
-                return response()->json($response->json());
-            }
-            
+        } catch (\Throwable $e) {
+            Log::error('Groq STT failed', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
-                'error' => 'Failed to convert speech',
-                'status' => $response->status()
-            ]);
-            
-        } catch (\Exception $e) {
-            \Log::error('STT error: ' . $e->getMessage());
-            return response()->json(['error' => 'Gagal mengenali suara: ' . $e->getMessage()], 500);
+                'message' => 'Nusa belum bisa mendengar suaramu.',
+                'diagnostic' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
         }
     }
-    
-    /**
-     * Text chat dengan AI - DIPERBAIKI
-     */
+
     public function textChat(Request $request)
     {
+        $validated = $request->validate([
+            'message' => 'required|string|max:500',
+            'age_group' => 'nullable|string|in:3-5,5-7,7-9,9-12',
+            'child_name' => 'nullable|string|max:80',
+            'module_title' => 'nullable|string|max:120',
+            'level_title' => 'nullable|string|max:120',
+        ]);
+
         try {
-            $request->validate([
-                'message' => 'required|string',
-                'age_group' => 'nullable|string|in:3-5,5-7,7-9,9-12',
-                'user_id' => 'nullable|string'
-            ]);
-            
-            $message = $request->message;
-            $ageGroup = $request->age_group ?? '5-7';
-            $userId = $request->user_id ?? 'user_' . auth()->id();
-            
-            // Kirim ke Python server
-            $response = Http::post("{$this->pythonBaseUrl}/api/chat", [
-                'message' => $message,
+            $user = auth()->user();
+            $ageGroup = $validated['age_group'] ?? '3-5';
+            $context = $this->contextFromRequest($request, $ageGroup);
+            $context['history'] = $this->historyFor($user?->id);
+            $aiResponse = $this->groq->chat($validated['message'], $context);
+            $audio = $this->tts->synthesize($aiResponse, $user, 'text_chat');
+
+            $this->saveToHistory($user?->id, [
+                'user_text' => $validated['message'],
+                'ai_response' => $aiResponse,
                 'age_group' => $ageGroup,
-                'user_id' => $userId
+                'timestamp' => now()->toDateTimeString(),
             ]);
-            
-            if ($response->successful()) {
-                $headers = $response->headers();
-                $aiResponse = $headers['X-AI-Response'][0] ?? $message;
-                
-                // Simpan ke history
-                $this->saveToHistory(auth()->id(), [
-                    'user_text' => $message,
-                    'ai_response' => $aiResponse,
-                    'age_group' => $ageGroup,
-                    'timestamp' => now()->toDateTimeString()
-                ]);
-                
-                return response($response->body())
-                    ->header('Content-Type', 'audio/mpeg')
-                    ->header('Cache-Control', 'no-cache')
-                    ->header('X-AI-Response', $aiResponse)
-                    ->header('Access-Control-Expose-Headers', 'X-AI-Response');
+
+            if (!$audio['success']) {
+                return $this->creditFallback($aiResponse, $validated['message'], $audio);
             }
-            
-            // Fallback
-            return $this->generateFallbackAudio("Halo! Saya Calista. Mari kita belajar bersama!");
-            
-        } catch (\Exception $e) {
-            \Log::error('Text chat error: ' . $e->getMessage());
-            return $this->generateFallbackAudio("Maaf, saya tidak bisa merespons sekarang.");
+
+            return response($audio['audio'])
+                ->header('Content-Type', $audio['content_type'])
+                ->header('Cache-Control', 'no-cache, no-store')
+                ->header('X-AI-Response', $this->safeHeader($aiResponse))
+                ->header('X-AI-Plan', $audio['credit']['plan'] ?? 'free')
+                ->header('X-AI-Credits-Remaining', (string) ($audio['credit']['remaining'] ?? 0))
+                ->header('Access-Control-Expose-Headers', 'X-AI-Response,X-AI-Plan,X-AI-Credits-Remaining');
+        } catch (\Throwable $e) {
+            Log::error('Nusa text chat failed', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Nusa belum bisa menjawab sekarang.',
+                'diagnostic' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
         }
     }
-    
-    /**
-     * Check server health - DIPERBAIKI
-     */
+
     public function checkServerHealth()
     {
-        try {
-            $response = Http::timeout(10)->get("{$this->pythonBaseUrl}/health");
-            
-            return response()->json([
-                'server_url' => $this->pythonBaseUrl,
-                'status' => $response->successful() ? 'online' : 'offline',
-                'response' => $response->successful() ? $response->json() : null,
-                'timestamp' => now()->toDateTimeString()
-            ]);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'server_url' => $this->pythonBaseUrl,
-                'status' => 'offline',
-                'error' => $e->getMessage(),
-                'timestamp' => now()->toDateTimeString()
-            ], 500);
-        }
-    }
-    
-    /**
-     * Get conversation history
-     */
-    public function getHistory(Request $request)
-    {
-        try {
-            $userId = auth()->id();
-            $sessionId = $request->session_id ?? 'general';
-            
-            $history = Cache::get("voice_history_{$userId}_{$sessionId}", []);
-            
-            return response()->json([
-                'success' => true,
-                'history' => $history,
-                'count' => count($history)
-            ]);
-            
-        } catch (\Exception $e) {
-            \Log::error('Get history error: ' . $e->getMessage());
-            return response()->json(['error' => 'Gagal mengambil riwayat'], 500);
-        }
-    }
-    
-    /**
-     * Clear history
-     */
-    public function clearHistory(Request $request)
-    {
-        try {
-            $userId = auth()->id();
-            $sessionId = $request->session_id ?? 'general';
-            
-            Cache::forget("voice_history_{$userId}_{$sessionId}");
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Riwayat percakapan telah dihapus'
-            ]);
-            
-        } catch (\Exception $e) {
-            \Log::error('Clear history error: ' . $e->getMessage());
-            return response()->json(['error' => 'Gagal menghapus riwayat'], 500);
-        }
-    }
-    
-    /**
-     * Learning session dengan topik tertentu - DIPERBAIKI
-     */
-    public function learningSession(Request $request)
-    {
-        try {
-            $request->validate([
-                'topic' => 'required|string',
-                'age_group' => 'nullable|string',
-                'difficulty' => 'nullable|string'
-            ]);
-            
-            $topic = $request->topic;
-            $ageGroup = $request->age_group ?? '5-7';
-            $difficulty = $request->difficulty ?? 'easy';
-            
-            // Generate greeting berdasarkan topik
-            $greetingText = "Halo! Ayo kita belajar tentang {$topic} bersama Calista!";
-            
-            // Kirim ke Python server
-            $response = Http::post("{$this->pythonBaseUrl}/api/tts", [
-                'text' => $greetingText,
-                'age_group' => $ageGroup
-            ]);
-            
-            if ($response->successful()) {
-                return response($response->body())
-                    ->header('Content-Type', 'audio/mpeg')
-                    ->header('Cache-Control', 'no-cache')
-                    ->header('X-Topic', $topic)
-                    ->header('X-Greeting', $greetingText);
-            }
-            
-            return $this->generateFallbackAudio($greetingText);
-            
-        } catch (\Exception $e) {
-            \Log::error('Learning session error: ' . $e->getMessage());
-            return $this->generateFallbackAudio("Mari belajar bersama!");
-        }
-    }
-    
-    /**
-     * Test audio generation - DIPERBAIKI
-     */
-    public function testAudio(Request $request)
-    {
-        try {
-            $testText = $request->text ?? "Halo! Saya Calista, teman belajarmu yang ceria. Mari kita belajar bersama!";
-            $ageGroup = $request->age_group ?? '5-7';
-            
-            // Kirim ke Python server
-            $response = Http::post("{$this->pythonBaseUrl}/api/tts", [
-                'text' => $testText,
-                'age_group' => $ageGroup
-            ]);
-            
-            if ($response->successful()) {
-                return response($response->body())
-                    ->header('Content-Type', 'audio/mpeg')
-                    ->header('Cache-Control', 'no-cache')
-                    ->header('X-Test-Text', $testText);
-            }
-            
-            // Fallback menggunakan browser TTS
-            return response()->json([
-                'success' => false,
-                'message' => 'Server tidak merespons, menggunakan browser TTS',
-                'text' => $testText,
-                'age_group' => $ageGroup
-            ]);
-            
-        } catch (\Exception $e) {
-            \Log::error('Test audio error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'error' => 'Gagal membuat audio test',
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-    
-    // ==================== HELPER METHODS ====================
-    
-    /**
-     * Simpan ke history
-     */
-    private function saveToHistory($userId, $data)
-    {
-        $sessionId = session('voice_session_id', 'general');
-        $cacheKey = "voice_history_{$userId}_{$sessionId}";
-        
-        $history = Cache::get($cacheKey, []);
-        $history[] = $data;
-        
-        // Keep only last 20 messages
-        if (count($history) > 20) {
-            $history = array_slice($history, -20);
-        }
-        
-        Cache::put($cacheKey, $history, now()->addDays(7));
-    }
-    
-    /**
-     * Generate fallback audio menggunakan Typecast atau TTS lokal
-     */
-    private function generateFallbackAudio($text)
-    {
-        // Coba gunakan Typecast TTS yang sudah ada di sistem
-        try {
-            $ttsController = new \App\Http\Controllers\TypecastController();
-            $response = $ttsController->customTTS(new Request([
-                'text' => $text,
-                'character' => 'default'
-            ]));
-            
-            if ($response instanceof \Illuminate\Http\Response) {
-                return $response;
-            }
-        } catch (\Exception $e) {
-            \Log::warning('Typecast fallback failed: ' . $e->getMessage());
-        }
-        
-        // Jika semua gagal, return JSON dengan text untuk Web Speech API
         return response()->json([
-            'success' => false,
-            'message' => 'Menggunakan browser TTS',
-            'text' => $text,
-            'fallback' => true
+            'success' => true,
+            'status' => 'online',
+            'pipeline' => 'Groq STT -> Groq LLM -> ElevenLabs Streaming TTS',
+            'tts_model' => config('services.elevenlabs.model_id'),
+            'stt_model' => config('services.groq.stt_model'),
+            'chat_model' => config('services.groq.chat_model'),
+            'timestamp' => now()->toDateTimeString(),
         ]);
     }
-    
-    /**
-     * Get active anak
-     */
-    private function getActiveAnak()
+
+    public function creditStatus()
     {
-        $user = auth()->user();
-        return $user->anaks()->where('is_active', true)->first();
+        $guard = $this->credits->canSpend(auth()->user(), 1);
+
+        return response()->json([
+            'success' => true,
+            'plan' => $guard['plan'],
+            'limit' => $guard['limit'],
+            'used' => $guard['used'],
+            'remaining' => $guard['remaining'],
+            'period_start' => $guard['period_start'],
+        ]);
+    }
+
+    public function getHistory(Request $request)
+    {
+        $history = $this->historyFor(auth()->id(), $request->session_id ?? 'general');
+
+        return response()->json([
+            'success' => true,
+            'history' => $history,
+            'count' => count($history),
+        ]);
+    }
+
+    public function clearHistory(Request $request)
+    {
+        Cache::forget($this->historyKey(auth()->id(), $request->session_id ?? 'general'));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Riwayat percakapan telah dihapus',
+        ]);
+    }
+
+    public function learningSession(Request $request)
+    {
+        $topic = trim((string) $request->input('topic', 'belajar'));
+        $text = "Halo! Aku Nusa. Ayo kita belajar {$topic} bersama-sama!";
+
+        $request->merge(['text' => $text, 'feature' => 'learning_session']);
+        return $this->textToSpeech($request);
+    }
+
+    public function testAudio(Request $request)
+    {
+        $request->merge([
+            'text' => $request->input('text', 'Halo! Aku Nusa. Ayo belajar sambil bermain!'),
+            'feature' => 'test_audio',
+        ]);
+
+        return $this->textToSpeech($request);
+    }
+
+    private function contextFromRequest(Request $request, string $ageGroup): array
+    {
+        return [
+            'age_group' => $ageGroup,
+            'child_name' => $request->input('child_name', 'teman kecil'),
+            'module_slug' => $request->input('module_slug'),
+            'module_title' => $request->input('module_title', 'belajar'),
+            'level_title' => $request->input('level_title'),
+            'expected_answer' => $request->input('expected_answer'),
+            'learning_instruction' => $request->input('learning_instruction'),
+            'learning_hint' => $request->input('learning_hint'),
+        ];
+    }
+
+    private function normalizeReadingText(string $text): string
+    {
+        $uppercase = mb_strtoupper(trim($text), 'UTF-8');
+        return preg_replace('/[^\p{L}\p{N}]+/u', '', $uppercase) ?? '';
+    }
+
+    private function saveToHistory($userId, array $data): void
+    {
+        $sessionId = session('voice_session_id', 'general');
+        $history = $this->historyFor($userId, $sessionId);
+        $history[] = $data;
+
+        Cache::put($this->historyKey($userId, $sessionId), array_slice($history, -12), now()->addDays(7));
+    }
+
+    private function historyFor($userId, string $sessionId = 'general'): array
+    {
+        return Cache::get($this->historyKey($userId, $sessionId), []);
+    }
+
+    private function historyKey($userId, string $sessionId): string
+    {
+        return 'voice_history_' . ($userId ?? 'guest') . '_' . $sessionId;
+    }
+
+    private function safeHeader(string $value): string
+    {
+        return str_replace(["\r", "\n"], ' ', mb_substr($value, 0, 180, 'UTF-8'));
+    }
+
+    private function creditFallback(string $aiText, string $userText, array $audio)
+    {
+        return response()->json([
+            'success' => false,
+            'fallback' => true,
+            'reason' => $audio['reason'] ?? 'tts_unavailable',
+            'message' => $audio['message'] ?? 'Suara Nusa belum tersedia.',
+            'text' => $aiText,
+            'ai_response' => $aiText,
+            'user_text' => $userText,
+            'credit' => $audio['credit'] ?? null,
+        ], 402)->header('X-AI-Response', $this->safeHeader($aiText))
+            ->header('X-AI-Credit-Exhausted', 'true')
+            ->header('Access-Control-Expose-Headers', 'X-AI-Response,X-AI-Credit-Exhausted');
     }
 }

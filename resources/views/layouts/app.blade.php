@@ -511,6 +511,7 @@
         <div class="star star4">💫</div>
     </div>
 
+    @if(!session('is_mobile_webview'))
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -544,12 +545,14 @@
             </div>
         </div>
     </nav>
+    @endif
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" style="{{ session('is_mobile_webview') ? 'padding: 0; min-height: 100vh;' : '' }}">
         @yield('content')
     </main>
 
+    @if(!session('is_mobile_webview'))
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
@@ -572,6 +575,7 @@
             </div>
         </div>
     </footer>
+    @endif
 
     <!-- Notifications -->
     @if(session('success'))

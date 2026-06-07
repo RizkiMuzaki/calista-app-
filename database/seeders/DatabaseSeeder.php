@@ -23,8 +23,16 @@ class DatabaseSeeder extends Seeder
         ]);
 
     $this->call([
-    PlanSeeder::class,
-]);
+        PlanSeeder::class,
+        CharacterItemSeeder::class, // Baju/Avatar
+        // 🎮 Game Content Seeders — urutan PENTING: Module → Level
+        ModuleSeeder::class,
+        LevelSeeder::class,
+        StoryContentSeeder::class,
+        
+        // Data Anak & Premium (Seeder ini mungkin butuh Module/Levels jadi ditaruh di bawah)
+        ChildSeeder::class,
+    ]);
     
     }
 

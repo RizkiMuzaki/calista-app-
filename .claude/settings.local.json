@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "PowerShell(Get-Content \"$env:USERPROFILE\\\\.claude\\\\settings.local.json\" -ErrorAction SilentlyContinue | Select-Object -First 100)",
+      "PowerShell([System.IO.File]::ReadAllText\\(\"$env:USERPROFILE\\\\.claude\\\\settings.local.json\"\\))",
+      "Bash(npx -y @context7/mcp-server --version)",
+      "WebSearch",
+      "WebFetch(domain:www.context7.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(flutter analyze *)"
+    ]
+  }
+}

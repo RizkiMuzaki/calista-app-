@@ -17,7 +17,6 @@ class Dashboard extends BaseDashboard
             \App\Filament\Widgets\RevenuePlanStatsWidget::class,
             \App\Filament\Widgets\UserStatsWidget::class,
             \App\Filament\Widgets\ActiveChildrenWidget::class,
-            \App\Filament\Widgets\GameStatsWidget::class,
             \App\Filament\Widgets\ModuleStatsWidget::class,
             \App\Filament\Widgets\PremiumBookStatsWidget::class,
         ];

@@ -1,59 +1,29 @@
 <?php
-// app/Models/StoryPage.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StoryPage extends Model
 {
-protected $table = 'story_pages';
+    protected $fillable = [
+        'story_id',
+        'page_number',
+        'story_text',
+        'start_time',
+        'end_time',
+        'animation_trigger_state'
+    ];
 
-protected $fillable = [
-    'book_id',
-    'page_number',
-    'story_text',
-    'audio_path',
-    'question',
-    'duration',
-    'is_active',
-];
+    protected $casts = [
+        'page_number' => 'integer',
+        'start_time' => 'double',
+        'end_time' => 'double',
+    ];
 
-protected $appends = ['full_image_paths'];
-
-public function book()
-{
-    return $this->belongsTo(Book::class);
-}
-
-public function images()
-{
-    return $this->hasMany(StoryImage::class, 'story_page_id');
-}
-
-public function choices()
-{
-    return $this->hasMany(StoryChoice::class, 'story_page_id');
-}
-
-// Getter untuk full image URLs
-public function getFullImagePathsAttribute()
-{
-    if (!$this->relationLoaded('images')) {
-        return [];
+    public function story(): BelongsTo
+    {
+        return $this->belongsTo(Story::class);
     }
-    
-    return $this->images->map(function ($image) {
-        return [
-            'id' => $image->id,
-            'type' => $image->type,
-            'order' => $image->order,
-            'start_second' => $image->start_second,
-            'end_second' => $image->end_second,
-            'image_path' => $image->image_path,
-            'full_url' => asset('storage/' . $image->image_path),
-            'storage_path' => storage_path('app/public/' . $image->image_path),
-        ];
-    });
-}
 }

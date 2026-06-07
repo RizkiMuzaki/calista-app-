@@ -1,64 +1,47 @@
-# 📋 TASKS BREAKDOWN - CALISTA SKRIPSI
+# 📋 CALISTA PROJECT TASKS
 
-> **Status**: 🟢 Database Fully Restored & Verified
-> **Focus**: Testing AI Integration & UI Polish
-> **Rule**: One task at a time. Move from 🔴 TODO to 🟡 IN PROGRESS to 🟢 DONE.
+## 🔴 BACKEND (LARAVEL)
+- [x] Auth System (Login, Register)
+- [x] Child Management (CRUD Profile Anak)
+- [x] Module & Level Data
+- [x] Progress Tracking System
+- [x] Shop & Inventory System
+- [x] Voice Agent API (Typecast API Integration & Caching)
+- [x] Payment System (Tripay, Checkout, Callback Validation)
+- [x] Louvin Subscription Integration (Sync Plan IDs, prices, names, and fix missing reference SQL 500 error)
+- [ ] Security Audit (Input Sanitization)
 
-## 🧑‍💻 HACKER (Rizki & Tasya)
+## 🟡 FRONTEND (FLUTTER)
+- [x] Onboarding & Walkthrough
+- [x] Child Selection Dashboard
+- [x] Main Dashboard (Home)
+- [x] Game Selection Module
+- [x] Profile & Parental Gateway
+- [x] Shop (Bento UI)
+- [x] Voice Agent AI Page (NusaChatScreen)
+- [x] Game Berhitung (Counting Drop with Dynamic TTS)
+- [ ] Play Timer Backend Integration
 
-### 🚨 Critical Infrastructure
+## 🟢 STABILITY FIXES (COMPLETED)
+- [x] Fix empty shop screen (UI)
+- [x] Resolve hardcoded childId in Dashboard
+- [x] Implement dynamic Child Profile in Settings
+- [x] Fix PHP linter warnings (Controller map closures)
+- [x] Complete Logout Logic with Confirmation
+- [x] Implement Reward Claim Validation (Backend)
+- [x] Rebuild Game Menulis (A-Z levels, auto-play TTS walkthrough, animated guided tracing, glassmorphism CCW reset)
+- [x] Fix PaymentController fatal error (Pesanan class)
+- [x] Fix LevelController counting item null pointer
+- [x] Fix VoiceAgentController speech-to-text timeout issue
+- [x] Fix Audio Clipping for TTS and fallback audio overlapping
+- [x] Fix offline audio pack generation stuck at 0% (PHP CLI fallback when ZipArchive is missing, Flutter tolerance mode, and public disk path fix)
 
-- [x] 🟢 **Setup Git & GitHub**: Initialize repo & create `COLLABORATION_GUIDE.md`.
-- [x] 🟢 **Database Migration & Import**: Fixed SQL collation and imported `calistaadmin.sql`. Verified data integrity.
-- [/] 🟡 **Security & GitHub Sync**:
-    - [x] Fix hardcoded secrets in `voiceagent.py`.
-    - [ ] Clean Git history to remove leaked secrets.
-    - [ ] Push to GitHub (Push Protection bypass/fix).
-- [ ] 🟡 **Consolidate AI Services**: Gabungkan logic Menghitung, Menulis, & Cerita ke satu `voiceagent.py` (Port 5000).
-- [ ] 🔴 **Add Missing Endpoints**: Implement `/api/writing/*` di dalam `voiceagent.py`.
-- [ ] 🔴 **Admin Panel**: Setup Filament resource untuk management `Modules` dan `Books`.
 
-### 📚 Education Modules (Tasya)
-
-- [ ] 🔴 **Feature Menulis**: Logic validasi input text/tracing.
-- [ ] 🔴 **Feature Menghitung**: Logic generate soal matematika random.
-- [ ] 🔥 **Progress Tracking**: Simpan score anak ke DB `progres_anaks`.
-
-### 🤖 AI Integrations (Rizki)
-
-- [ ] 🔴 **Voice Agent Controller**: Bikin bridge PHP <-> Python yg stabil.
-- [ ] 🔥 **TTS (Text-to-Speech)**: Pastikan suara Calista keluar jernih.
-- [ ] 🌤️ **Story AI**: Generate cerita simple via OpenAI/local LLM.
-
----
-
-## 🎨 HIPSTER (UI/UX Designer)
-
-### 🖌️ Frontend Polish
-
-- [ ] 🔴 **Landing Page**: Perbaiki layout `welcome.blade.php` biar "Jual Mahal".
-- [ ] 🔥 **Animations**: Implementasi animasi di folder `ANIMASI_*.md`.
-- [ ] 🌤️ **Mobile Responsive**: Cek tampilan di HP (Penting buat demo!).
-- [ ] 🌤️ **Asset Opt**: Kompres gambar biar loading cepat.
-- [ ] 🔥 **Fix Broken Images**: Cek semua gambar di Landing Page & Dashboard.
-
-### 🧩 Components
-
-- [ ] 🔥 **Card Component**: Design card modul belajar yang lucu.
-- [ ] 🌤️ **Button Styles**: Standarisasi tombol (Primary, Secondary, Danger).
+## 🟢 VOICE AI OPTIMIZATION (COMPLETED)
+- [x] Synchronize Laravel controller ports to port 5003
+- [x] Implement FallbackTTS in voiceagent.py (Typecast -> EdgeTTS)
+- [x] Implement `/api/writing` aliases in voiceagent.py
+- [x] Optimize pre-fetching & cache validation for questions & choices
 
 ---
-
-## 💼 HUSTLER (Business/Ops)
-
-### 💰 Monetization
-
-- [ ] 🔴 **Subscription Plans**: Tentukan harga & fitur Premium vs Free.
-- [ ] 🔥 **Check Payment**: Cek `PaymentController`, apakah logic Midtrans sudah benar?
-- [ ] 🔥 **Pitch Deck**: Buat slide presentasi skripsi yang "Menjual".
-
-### 🧪 Quality Assurance
-
-- [ ] 🔥 **User Testing**: Coba kasih ke anak kecil beneran, lihat responnya.
-- [ ] 🌤️ **Bug Hunting**: Catat semua error 500/404.
-- [ ] 🌤️ **User Scenario Testing**: Bikin skenario "Anak Salah Menjawab" vs "Anak Benar".
+*Status Update: 31 May 2026 - Voice AI Optimization & Mismatched Ports Fix.*

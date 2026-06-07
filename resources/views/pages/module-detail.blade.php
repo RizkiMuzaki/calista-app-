@@ -1128,7 +1128,7 @@
                         $stars = $progresDetails[$levelItem->id]->bintang ?? 0;
                     }
                     
-                    $firstWriting = \App\Models\WritingItems::where('level_id', $levelItem->id)->first();
+                    $firstWriting = \App\Models\WritingItem::where('level_id', $levelItem->id)->first();
                     $firstCounting = \App\Models\CountingItem::where('level_id', $levelItem->id)->first();
                     $firstPuzzle = \App\Models\PuzzleItem::where('level_id', $levelItem->id)
                                     ->where('is_active', true)
