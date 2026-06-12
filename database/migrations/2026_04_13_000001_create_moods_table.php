@@ -32,7 +32,7 @@ return new class extends Migration
             $table->enum('mood_type', [
                 'senang',    // 😊 Happy
                 'sedih',     // 😢 Sad
-                'penasaran', // 🤔 Curious
+                'ceria',     // 🤩 Cheerful
                 'takut',     // 😨 Afraid
                 'marah',     // 😠 Angry
             ]);

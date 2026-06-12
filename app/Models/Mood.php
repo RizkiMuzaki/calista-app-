@@ -51,10 +51,7 @@ class Mood extends Model
      */
     public function scopeTodayFor($query, int $childId)
     {
-        $start = Carbon::now('Asia/Jakarta')->startOfDay()->timezone('UTC');
-        $end = Carbon::now('Asia/Jakarta')->endOfDay()->timezone('UTC');
-
         return $query->where('anak_id', $childId)
-            ->whereBetween('created_at', [$start, $end]);
+            ->whereDate('created_at', Carbon::today('Asia/Jakarta'));
     }
 }

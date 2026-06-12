@@ -38,7 +38,7 @@ class AiCreditService
             return $this->planConfig('monthly');
         }
 
-        return $this->planConfig('monthly');
+        return $this->planConfig('free');
     }
 
     public function canSpend(?User $user, int $credits): array
@@ -105,7 +105,7 @@ class AiCreditService
     {
         $plans = config('services.calista_ai.credit_plans', []);
         $defaults = [
-            'free' => ['code' => 'free', 'limit' => 50000, 'reset' => 'monthly'],
+            'free' => ['code' => 'free', 'limit' => 0, 'reset' => 'monthly'],
             'weekly' => ['code' => 'weekly', 'limit' => 30000, 'reset' => 'weekly'],
             'monthly' => ['code' => 'monthly', 'limit' => 100000, 'reset' => 'monthly'],
         ];

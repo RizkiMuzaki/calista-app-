@@ -37,7 +37,7 @@ class MoodController extends Controller
         try {
             $validated = $request->validate([
                 'child_id' => 'required|integer',
-                'mood_type' => 'required|in:senang,sedih,penasaran,takut,marah',
+                'mood_type' => 'required|in:senang,sedih,ceria,takut,marah',
                 'catatan' => 'nullable|string|max:500',
             ]);
 
@@ -218,7 +218,7 @@ class MoodController extends Controller
      */
     private function normalizeMoodSummary($summary)
     {
-        $keys = ['senang', 'penasaran', 'takut', 'sedih', 'marah'];
+        $keys = ['senang', 'ceria', 'takut', 'sedih', 'marah'];
         return collect($keys)->mapWithKeys(function ($key) use ($summary) {
             return [$key => (int) ($summary[$key] ?? 0)];
         });

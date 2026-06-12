@@ -39,10 +39,10 @@ class CharacterItemSeeder extends Seeder
             ],
             [
                 'name' => 'Nusa Elephant Ranger',
-                'description' => 'Welcome gift spesial untuk member pertama Calista Plus.',
+                'description' => 'Gaya Sahabat Gajah spesial Nusa. Dapatkan gratis setelah mengumpulkan 12 bintang dari kotak chest!',
                 'image_url' => 'assets/images/shop/nusa_elephant_ranger.png',
-                'unlock_type' => 'premium',
-                'reward_condition' => null,
+                'unlock_type' => 'star_reward',
+                'reward_condition' => '12',
                 'sort_order' => 4,
             ],
             [
@@ -87,7 +87,7 @@ class CharacterItemSeeder extends Seeder
         }
 
         CharacterItem::whereNotIn('name', array_column($items, 'name'))
-            ->whereIn('unlock_type', ['free', 'reward', 'premium'])
+            ->whereIn('unlock_type', ['free', 'reward', 'premium', 'star_reward'])
             ->update(['is_active' => false]);
 
         ChildItem::whereHas('characterItem', function ($query) {

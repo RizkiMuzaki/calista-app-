@@ -26,9 +26,10 @@ class PlanSeeder extends Seeder
                 'nama_paket' => 'Calista Plus Tahunan',
                 'durasi_bulan' => 12,
                 'harga_jual' => 866000,
-                'deskripsi' => "Paket 12 bulan penuh untuk belajar stabil, akses premium panjang, dan prioritas fitur Nusa terbaru.",
+                'deskripsi' => "Paket hemat luar biasa setahun penuh: akses penuh dongeng premium, games, wardrobe penuh, dan Voice Tutor AI.",
             ],
         ];
+
 
         foreach ($plans as $plan) {
             DB::table('plans')->updateOrInsert(

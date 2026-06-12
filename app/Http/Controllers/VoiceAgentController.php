@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Module;
 use App\Services\AiCreditService;
 use App\Services\ElevenLabsTtsService;
 use App\Services\GroqAiService;
@@ -19,30 +18,6 @@ class VoiceAgentController extends Controller
     ) {
     }
 
-    public function index(Request $request)
-    {
-        $user = auth()->user();
-        $activeAnak = $user?->anaks()->where('is_active', true)->first();
-
-        $modules = Module::where('type', 'voice_chat')
-            ->orWhere('slug', 'LIKE', 'voice-%')
-            ->orderBy('order_number')
-            ->get();
-
-        return view('pages.voice-agent.index', compact('modules', 'activeAnak'));
-    }
-
-    public function voiceChat(Request $request, $slug = null)
-    {
-        $user = auth()->user();
-        $activeAnak = $user?->anaks()->where('is_active', true)->first();
-        $module = $slug ? Module::where('slug', $slug)->first() : null;
-        $sessionId = 'voice_' . ($slug ?? 'general') . '_' . ($user?->id ?? 'guest') . '_' . now()->timestamp;
-
-        session(['voice_session_id' => $sessionId]);
-
-        return view('pages.voice-agent.chat', compact('module', 'activeAnak', 'sessionId'));
-    }
 
     public function processVoice(Request $request)
     {
@@ -56,10 +31,21 @@ class VoiceAgentController extends Controller
             'expected_answer' => 'nullable|string|max:120',
             'learning_instruction' => 'nullable|string|max:255',
             'learning_hint' => 'nullable|string|max:255',
+            'session_id' => 'nullable|string|max:100',
         ]);
 
         try {
             $user = auth()->user();
+            
+            // 🆓 Blokir Akses Voice untuk User Free
+            $plan = $this->credits->planFor($user);
+            if ($plan['code'] === 'free') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fitur Voice Tutor Nusa eksklusif untuk member Calista Plus. Yuk berlangganan!',
+                ], 403);
+            }
+
             $ageGroup = $validated['age_group'] ?? '3-5';
             $audioFile = $request->file('audio');
             $userText = $this->groq->transcribe($audioFile, 'id');
@@ -72,9 +58,59 @@ class VoiceAgentController extends Controller
                 ], 422);
             }
 
+            $sessionId = $request->input('session_id', 'general');
             $context = $this->contextFromRequest($request, $ageGroup);
-            $context['history'] = $this->historyFor($user?->id);
+            $context['history'] = $this->historyFor($user?->id, $sessionId);
+
+            // ⏱️ Pembatasan Maksimal 5 Pertanyaan per Sesi
+            $turnKey = 'voice_session_turn_count_' . $sessionId;
+            $turnCount = (int) Cache::get($turnKey, 0) + 1;
+            Cache::put($turnKey, $turnCount, now()->addHours(2));
+
+            $extraInstructions = [];
+            if ($turnCount >= 5) {
+                $extraInstructions[] = "Ini adalah giliran terakhir. Ucapkan kalimat perpisahan yang hangat dan katakan bahwa kamu (Nusa) harus tidur/istirahat sekarang. Jangan memberikan pertanyaan baru lagi.";
+            }
+
+            // 📈 Integrasi Entity Extraction & Penyimpanan Profil Anak
+            $extraInstructions[] = "Ekstraksi Minat Anak: Jika anak menyebutkan cita-citanya (seperti dokter, astronot, tentara, dll), hobinya (seperti berenang, menggambar, bersepeda, dll), atau makanan kesukaannya (seperti sayur bening, fried chicken, dll), tambahkan tag berikut di akhir jawabanmu: <profile_entities>{\"cita_cita\": \"cita-cita yang terdeteksi atau null\", \"hobi\": \"hobi yang terdeteksi atau null\", \"makanan\": \"makanan kesukaan yang terdeteksi atau null\"}</profile_entities>. Jika tidak ada yang terdeteksi, jangan tambahkan tag tersebut.";
+
+            $context['extra_instructions'] = implode("\n", $extraInstructions);
+
             $aiResponse = $this->groq->chat($userText, $context);
+
+            // Ekstrak entitas jika tag terdeteksi
+            $entities = null;
+            if (preg_match('/<profile_entities>(.*?)<\/profile_entities>/is', $aiResponse, $matches)) {
+                $entitiesJson = trim($matches[1]);
+                $entities = json_decode($entitiesJson, true);
+                $aiResponse = trim(str_replace($matches[0], '', $aiResponse));
+            }
+
+            $childId = $request->input('user_id');
+            $activeAnak = null;
+            if ($childId && $user) {
+                $activeAnak = $user->anaks()->where('id', $childId)->first();
+            }
+            if (!$activeAnak && $user) {
+                $activeAnak = $user->anaks()->where('is_active', true)->first();
+            }
+
+            if ($entities && $activeAnak) {
+                if (!empty($entities['cita_cita']) && $entities['cita_cita'] !== 'null') {
+                    $activeAnak->cita_cita = $entities['cita_cita'];
+                }
+                if (!empty($entities['hobi']) && $entities['hobi'] !== 'null') {
+                    $activeAnak->hobi = $entities['hobi'];
+                }
+                if (!empty($entities['makanan']) && $entities['makanan'] !== 'null') {
+                    $activeAnak->makanan_favorit = $entities['makanan'];
+                }
+                $activeAnak->save();
+            }
+
+            $this->trackVoiceChatSession($user, $activeAnak, $sessionId, $userText, $aiResponse, $turnCount);
+
             $audio = $this->tts->synthesize($aiResponse, $user, 'voice_chat');
 
             $this->saveToHistory($user?->id, [
@@ -82,7 +118,7 @@ class VoiceAgentController extends Controller
                 'ai_response' => $aiResponse,
                 'age_group' => $ageGroup,
                 'timestamp' => now()->toDateTimeString(),
-            ]);
+            ], $sessionId);
 
             if (!$audio['success']) {
                 return $this->creditFallback($aiResponse, $userText, $audio);
@@ -149,6 +185,16 @@ class VoiceAgentController extends Controller
         ]);
 
         try {
+            $user = auth()->user();
+
+            // 🆓 Blokir Akses Voice untuk User Free
+            $plan = $this->credits->planFor($user);
+            if ($plan['code'] === 'free') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fitur Voice Tutor Nusa eksklusif untuk member Calista Plus. Yuk berlangganan!',
+                ], 403);
+            }
             $audio = $this->tts->synthesize(
                 $validated['text'],
                 auth()->user(),
@@ -214,6 +260,15 @@ class VoiceAgentController extends Controller
 
         try {
             $user = auth()->user();
+
+            // 🆓 Blokir Akses Voice untuk User Free
+            $plan = $this->credits->planFor($user);
+            if ($plan['code'] === 'free') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fitur Voice Tutor Nusa eksklusif untuk member Calista Plus. Yuk berlangganan!',
+                ], 403);
+            }
             $ageGroup = $validated['age_group'] ?? '3-5';
             $context = $this->contextFromRequest($request, $ageGroup);
             $context['history'] = $this->historyFor($user?->id);
@@ -336,9 +391,8 @@ class VoiceAgentController extends Controller
         return preg_replace('/[^\p{L}\p{N}]+/u', '', $uppercase) ?? '';
     }
 
-    private function saveToHistory($userId, array $data): void
+    private function saveToHistory($userId, array $data, string $sessionId = 'general'): void
     {
-        $sessionId = session('voice_session_id', 'general');
         $history = $this->historyFor($userId, $sessionId);
         $history[] = $data;
 
@@ -358,6 +412,56 @@ class VoiceAgentController extends Controller
     private function safeHeader(string $value): string
     {
         return str_replace(["\r", "\n"], ' ', mb_substr($value, 0, 180, 'UTF-8'));
+    }
+
+    private function trackVoiceChatSession($user, $child, string $sessionId, string $userText, string $aiResponse, int $turnCount): void
+    {
+        if (!$user || !$child) {
+            return;
+        }
+
+        try {
+            $playSession = \App\Models\PlaySession::firstOrNew([
+                'session_uuid' => $sessionId,
+            ]);
+
+            // Accumulate duration: 30 seconds per turn
+            $duration = $playSession->exists ? ($playSession->duration_seconds + 30) : 30;
+            $endedAt = now();
+            $startedAt = $playSession->exists ? $playSession->started_at : $endedAt->copy()->subSeconds(30);
+
+            $metadata = (array) ($playSession->metadata ?? []);
+            $questions = $metadata['questions'] ?? [];
+            $questions[] = [
+                'question' => $userText,
+                'answer' => $aiResponse,
+                'timestamp' => now()->toDateTimeString(),
+            ];
+
+            $playSession->fill([
+                'user_id' => $user->id,
+                'anak_id' => $child->id,
+                'source' => 'voice_chat',
+                'module_slug' => 'ai_chat',
+                'module_name' => 'Tanya Nusa',
+                'level_title' => 'Tanya Nusa (Whisper)',
+                'status' => 'completed',
+                'score' => 100,
+                'current_score' => 100,
+                'bintang' => 5,
+                'duration_seconds' => $duration,
+                'started_at' => $startedAt,
+                'ended_at' => $endedAt,
+                'played_on' => $endedAt->toDateString(),
+                'metadata' => array_merge($metadata, [
+                    'turns' => $turnCount,
+                    'questions' => $questions,
+                ]),
+            ]);
+            $playSession->save();
+        } catch (\Throwable $e) {
+            Log::error('Failed to track voice chat session', ['error' => $e->getMessage()]);
+        }
     }
 
     private function creditFallback(string $aiText, string $userText, array $audio)

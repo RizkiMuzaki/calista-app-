@@ -37,6 +37,9 @@ class Anak extends Model
         'tanggal_reset',
         'timer_started_at',
         'timer_last_updated',
+        'cita_cita',
+        'hobi',
+        'makanan_favorit',
     ];
 
     protected $casts = [

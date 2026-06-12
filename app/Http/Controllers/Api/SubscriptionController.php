@@ -87,7 +87,6 @@ class SubscriptionController extends Controller
                 'provider_transaction_id' => $transactionId,
                 'provider_subscription_id' => null,
                 'provider_payload' => $louvinResponse,
-                'reference' => $reference,
                 'merchant_ref' => $orderId,
                 'payment_method' => $payment['payment_type'] ?? 'qris',
                 'payment_name' => strtoupper($payment['payment_type'] ?? 'qris'),
@@ -362,7 +361,7 @@ class SubscriptionController extends Controller
         $itemQuery = CharacterItem::query();
 
         if (str_contains($planName, 'mingguan')) {
-            $itemQuery->where('name', 'Nusa Elephant Ranger');
+            $itemQuery->where('name', 'Nusa Panda Scout');
         } else {
             $itemQuery->where('unlock_type', 'premium');
         }

@@ -109,6 +109,7 @@ class GroqAiService
         $levelTitle = trim((string) ($context['level_title'] ?? ''));
         $expectedAnswer = trim((string) ($context['expected_answer'] ?? ''));
         $learningHint = trim((string) ($context['learning_hint'] ?? ''));
+        $extraInstructions = trim((string) ($context['extra_instructions'] ?? ''));
 
         return implode("\n", array_filter([
             "Kamu adalah Nusa, anak perempuan kecil umur 5-6 tahun di aplikasi edukasi Calista.",
@@ -123,6 +124,7 @@ class GroqAiService
             $levelTitle !== '' ? "Level: {$levelTitle}." : null,
             $expectedAnswer !== '' ? "Jawaban yang diharapkan: {$expectedAnswer}. Jangan langsung membocorkan kecuali anak minta bantuan." : null,
             $learningHint !== '' ? "Petunjuk guru: {$learningHint}." : null,
+            $extraInstructions !== '' ? $extraInstructions : null,
         ]));
     }
 

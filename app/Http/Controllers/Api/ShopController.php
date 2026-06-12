@@ -86,6 +86,8 @@ class ShopController extends Controller
                     $status = ($item->id === $equippedItemId) ? 'equipped' : 'owned';
                 } elseif ($item->unlock_type === 'reward') {
                     $status = 'locked_reward';
+                } elseif ($item->unlock_type === 'star_reward') {
+                    $status = 'locked_star';
                 } elseif ($item->unlock_type === 'premium') {
                     $status = $hasSubscription ? 'available' : 'locked_premium';
                 }
@@ -97,6 +99,7 @@ class ShopController extends Controller
                     'image_url' => $item->image_url,
                     'unlock_type' => $item->unlock_type,
                     'reward_condition' => $item->reward_condition,
+                    'stars_required' => $item->unlock_type === 'star_reward' ? (int) $item->reward_condition : 0,
                     'status' => $status,
                 ];
             });
@@ -162,10 +165,10 @@ class ShopController extends Controller
                 ], 404);
             }
 
-            if ($item->unlock_type !== 'reward') {
+            if ($item->unlock_type !== 'reward' && $item->unlock_type !== 'star_reward') {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Baju ini bukan tipe reward',
+                    'message' => 'Baju ini bukan tipe reward atau star reward',
                 ], 422);
             }
 
@@ -181,18 +184,31 @@ class ShopController extends Controller
                 ], 409);
             }
 
-            // ✅ 🎓 LEARNING: Validasi syarat reward (Level minimal)
-            $completedLevels = $child->progresAnaks()->where('selesai', true)->count();
-            
-            $requiredProgress = (int) $item->reward_condition;
+            // ✅ 🎓 LEARNING: Validasi syarat reward (Level minimal / Jumlah bintang)
+            if ($item->unlock_type === 'star_reward') {
+                $totalStars = (int) $child->progresAnaks()->where('selesai', true)->sum('bintang');
+                $requiredStars = (int) $item->reward_condition;
 
-            if ($completedLevels < $requiredProgress) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => "Kamu butuh menyelesaikan {$requiredProgress} level untuk unlock baju ini. Sekarang: {$completedLevels} level.",
-                    'current_progress' => $completedLevels,
-                    'required_progress' => $requiredProgress,
-                ], 403);
+                if ($totalStars < $requiredStars) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Kamu butuh {$requiredStars} bintang untuk unlock baju ini. Sekarang kamu baru punya {$totalStars} bintang.",
+                        'current_progress' => $totalStars,
+                        'required_progress' => $requiredStars,
+                    ], 403);
+                }
+            } else {
+                $completedLevels = $child->progresAnaks()->where('selesai', true)->count();
+                $requiredProgress = (int) $item->reward_condition;
+
+                if ($completedLevels < $requiredProgress) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Kamu butuh menyelesaikan {$requiredProgress} level untuk unlock baju ini. Sekarang: {$completedLevels} level.",
+                        'current_progress' => $completedLevels,
+                        'required_progress' => $requiredProgress,
+                    ], 403);
+                }
             }
 
             // Unlock item!

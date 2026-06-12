@@ -12,6 +12,18 @@ class Story extends Model implements HasMedia
 {
     use InteractsWithMedia;
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('cover')
+            ->singleFile();
+
+        $this->addMediaCollection('full_narration')
+            ->singleFile();
+
+        $this->addMediaCollection('full_animation')
+            ->singleFile();
+    }
+
     protected $fillable = [
         'title',
         'slug',
@@ -22,6 +34,7 @@ class Story extends Model implements HasMedia
         'duration',
         'is_active',
         'is_premium',
+        'stars_required',
         'order'
     ];
 
@@ -29,12 +42,23 @@ class Story extends Model implements HasMedia
         'is_active' => 'boolean',
         'is_premium' => 'boolean',
         'rating' => 'double',
+        'stars_required' => 'integer',
         'order' => 'integer',
     ];
 
     public function pages(): HasMany
     {
         return $this->hasMany(StoryPage::class)->orderBy('page_number');
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(StoryReview::class);
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(StoryLike::class);
     }
 
     public static function booted()

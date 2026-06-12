@@ -15,9 +15,22 @@ class StoryApiController extends Controller
         if (empty($url)) {
             return null;
         }
+        
         if (preg_match('/^(http|https):\/\//', $url)) {
+            $path = parse_url($url, PHP_URL_PATH);
+            $host = parse_url($url, PHP_URL_HOST);
+            
+            // Rewrite host if it is a local IP, localhost, or our main domain to match the request host dynamically
+            $isLocalOrOwn = preg_match('/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|calista-mobile\.my\.id)/i', $host);
+            
+            if ($isLocalOrOwn && !empty($path)) {
+                $baseUrl = rtrim(request()->getSchemeAndHttpHost(), '/');
+                return $baseUrl . '/' . ltrim($path, '/');
+            }
+            
             return $url;
         }
+        
         $baseUrl = rtrim(request()->getSchemeAndHttpHost(), '/');
         return $baseUrl . '/' . ltrim($url, '/');
     }
@@ -28,7 +41,7 @@ class StoryApiController extends Controller
     public function index(Request $request)
     {
         try {
-            $user = auth()->user();
+            $user = auth('sanctum')->user();
             $stories = Story::where('is_active', true)
                 ->orderBy('order', 'asc')
                 ->get();
@@ -61,6 +74,7 @@ class StoryApiController extends Controller
                     'age_group' => $story->age_group,
                     'duration' => $story->duration,
                     'is_premium' => false, // Bypassed: force false for testing
+                    'stars_required' => (int) $story->stars_required,
                     'order' => (int) $story->order,
                     'cover_url' => $coverUrl,
                     'user_progress' => $progress,
@@ -87,7 +101,7 @@ class StoryApiController extends Controller
     public function show($slug)
     {
         try {
-            $user = auth()->user();
+            $user = auth('sanctum')->user();
             $story = Story::where('slug', $slug)
                 ->where('is_active', true)
                 ->firstOrFail();
@@ -138,6 +152,7 @@ class StoryApiController extends Controller
                     'age_group' => $story->age_group,
                     'duration' => $story->duration,
                     'is_premium' => false, // Bypassed: force false for testing
+                    'stars_required' => (int) $story->stars_required,
                     'full_script' => $story->full_script,
                     'cover_url' => $coverUrl,
                     'narration_url' => $narrationUrl,
@@ -170,7 +185,7 @@ class StoryApiController extends Controller
         ]);
 
         try {
-            $user = auth()->user();
+            $user = auth('sanctum')->user();
             if (!$user) {
                 return response()->json([
                     'success' => false,
@@ -213,6 +228,156 @@ class StoryApiController extends Controller
                 'success' => false,
                 'message' => 'Gagal menyimpan progress'
             ], 500);
+        }
+    }
+
+    /**
+     * Toggle like/unlike for a story
+     * POST /api/stories/{slug}/like
+     */
+    public function toggleLike(Request $request, $slug)
+    {
+        try {
+            $user = auth('sanctum')->user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            }
+
+            $story = Story::where('slug', $slug)->where('is_active', true)->firstOrFail();
+            $anakId = $request->input('anak_id');
+
+            $existingLike = \App\Models\StoryLike::where('story_id', $story->id)
+                ->where('user_id', $user->id)
+                ->where('anak_id', $anakId)
+                ->first();
+
+            if ($existingLike) {
+                $existingLike->delete();
+                $liked = false;
+            } else {
+                \App\Models\StoryLike::create([
+                    'story_id' => $story->id,
+                    'user_id' => $user->id,
+                    'anak_id' => $anakId,
+                ]);
+                $liked = true;
+            }
+
+            $likesCount = \App\Models\StoryLike::where('story_id', $story->id)->count();
+
+            return response()->json([
+                'success' => true,
+                'liked' => $liked,
+                'likes_count' => $likesCount,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['success' => false, 'message' => 'Dongeng tidak ditemukan'], 404);
+        } catch (\Exception $e) {
+            Log::error('[StoryApiController] toggleLike error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal memproses like'], 500);
+        }
+    }
+
+    /**
+     * Get reviews for a story
+     * GET /api/stories/{slug}/reviews
+     */
+    public function getReviews(Request $request, $slug)
+    {
+        try {
+            $story = Story::where('slug', $slug)->where('is_active', true)->firstOrFail();
+
+            $reviews = \App\Models\StoryReview::where('story_id', $story->id)
+                ->with(['user:id,name', 'anak:id,nama'])
+                ->orderByDesc('created_at')
+                ->limit(50)
+                ->get()
+                ->map(function ($review) {
+                    return [
+                        'id' => $review->id,
+                        'rating' => $review->rating,
+                        'comment' => $review->comment,
+                        'author' => $review->anak?->nama ?? $review->user?->name ?? 'Anonim',
+                        'is_child' => $review->anak_id !== null,
+                        'created_at' => $review->created_at->diffForHumans(),
+                    ];
+                });
+
+            $user = auth('sanctum')->user();
+            $anakId = $request->query('anak_id');
+            $userLiked = false;
+            $likesCount = \App\Models\StoryLike::where('story_id', $story->id)->count();
+            if ($user) {
+                $userLiked = \App\Models\StoryLike::where('story_id', $story->id)
+                    ->where('user_id', $user->id)
+                    ->where('anak_id', $anakId)
+                    ->exists();
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'reviews' => $reviews,
+                    'reviews_count' => $reviews->count(),
+                    'likes_count' => $likesCount,
+                    'user_liked' => $userLiked,
+                ],
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['success' => false, 'message' => 'Dongeng tidak ditemukan'], 404);
+        } catch (\Exception $e) {
+            Log::error('[StoryApiController] getReviews error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal mengambil ulasan'], 500);
+        }
+    }
+
+    /**
+     * Submit a review for a story
+     * POST /api/stories/{slug}/reviews
+     */
+    public function submitReview(Request $request, $slug)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:500',
+            'anak_id' => 'nullable|integer',
+        ]);
+
+        try {
+            $user = auth('sanctum')->user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+            }
+
+            $story = Story::where('slug', $slug)->where('is_active', true)->firstOrFail();
+            $anakId = $request->input('anak_id');
+
+            $review = \App\Models\StoryReview::updateOrCreate(
+                [
+                    'story_id' => $story->id,
+                    'user_id' => $user->id,
+                    'anak_id' => $anakId,
+                ],
+                [
+                    'rating' => $request->rating,
+                    'comment' => $request->comment,
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ulasan berhasil disimpan',
+                'data' => [
+                    'id' => $review->id,
+                    'rating' => $review->rating,
+                    'comment' => $review->comment,
+                ],
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['success' => false, 'message' => 'Dongeng tidak ditemukan'], 404);
+        } catch (\Exception $e) {
+            Log::error('[StoryApiController] submitReview error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal menyimpan ulasan'], 500);
         }
     }
 }

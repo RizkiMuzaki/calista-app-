@@ -172,6 +172,38 @@ class AnakResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('kirimLaporan')
+                    ->label('Kirim Laporan')
+                    ->icon('heroicon-o-envelope')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Kirim Laporan Belajar?')
+                    ->modalDescription('Tindakan ini akan mengirimkan email laporan rekapitulasi belajar anak selama 7 hari terakhir ke orang tua.')
+                    ->action(function (Anak $record) {
+                        $user = $record->user;
+                        if (!$user || !$user->email) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Email Orang Tua Tidak Ditemukan')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        $sent = \App\Services\EmailService::sendWeeklyReportEmail($user->email, $user->name, $record, true);
+                        if ($sent) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Laporan Belajar Terkirim')
+                                ->success()
+                                ->body("Berhasil mengirim laporan belajar {$record->nama_anak} ke {$user->email}.")
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Gagal Mengirim Laporan')
+                                ->danger()
+                                ->body('Periksa logs mail untuk detail error.')
+                                ->send();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

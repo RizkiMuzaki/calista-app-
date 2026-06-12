@@ -945,7 +945,7 @@ class ProgressController extends Controller
 
     private function normalizeMoodSummary($summary)
     {
-        $keys = ['senang', 'penasaran', 'takut', 'sedih', 'marah'];
+        $keys = ['senang', 'ceria', 'takut', 'sedih', 'marah'];
         return collect($keys)->mapWithKeys(fn ($key) => [$key => (int) ($summary[$key] ?? 0)]);
     }
 

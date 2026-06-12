@@ -44,13 +44,14 @@ class MoodResource extends Resource
                         'sangat_senang' => '😄 Sangat Senang',
                         'senang'        => '😊 Senang',
                         'biasa'         => '😐 Biasa Saja',
+                        'ceria'         => '🤩 Ceria',
                         'sedih'         => '😢 Sedih',
                         'marah'         => '😠 Marah',
                         'takut'         => '😨 Takut',
                         default         => ucfirst(str_replace('_', ' ', $state ?? '—')),
                     })
                     ->color(fn ($state) => match ($state) {
-                        'sangat_senang', 'senang' => 'success',
+                        'sangat_senang', 'senang', 'ceria' => 'success',
                         'biasa'                   => 'gray',
                         'sedih', 'takut'          => 'info',
                         'marah'                   => 'danger',
@@ -75,6 +76,7 @@ class MoodResource extends Resource
                         'sangat_senang' => '😄 Sangat Senang',
                         'senang'        => '😊 Senang',
                         'biasa'         => '😐 Biasa Saja',
+                        'ceria'         => '🤩 Ceria',
                         'sedih'         => '😢 Sedih',
                         'marah'         => '😠 Marah',
                         'takut'         => '😨 Takut',

@@ -20,6 +20,8 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Illuminate\Support\Str;
+use App\Filament\Resources\StoryResource\RelationManagers\ReviewsRelationManager;
+use App\Filament\Resources\StoryResource\RelationManagers\LikesRelationManager;
 
 class StoryResource extends Resource
 {
@@ -91,6 +93,12 @@ class StoryResource extends Resource
                         Toggle::make('is_premium')
                             ->label('Premium / Berbayar')
                             ->default(false),
+
+                        TextInput::make('stars_required')
+                            ->label('Bintang Dibutuhkan')
+                            ->numeric()
+                            ->default(0)
+                            ->helperText('0 = gratis, 6 = perlu 6 bintang untuk unlock'),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Skrip Cerita (Tampil Melayang)')
@@ -110,27 +118,118 @@ class StoryResource extends Resource
                         SpatieMediaLibraryFileUpload::make('cover')
                             ->label('Gambar Cover Cerita')
                             ->collection('cover')
-                            ->image()
                             ->disk('public')
-                            ->maxSize(10 * 1024) // 10MB
-                            ->required(),
+                            ->required()
+                            ->rules([
+                                function () {
+                                    return function (string $attribute, $value, \Closure $fail) {
+                                        if (is_string($value) && (str_contains($value, 'livewire-tmp') || empty($value))) {
+                                            $fail('File cover tidak valid atau gagal diupload. Silakan pilih dan upload ulang file Anda.');
+                                            return;
+                                        }
+
+                                        if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                                            try {
+                                                \Illuminate\Support\Facades\Log::info('Cover upload debug', [
+                                                    'path' => $value->getPathname(),
+                                                    'exists' => $value->exists(),
+                                                ]);
+                                                if (!$value->exists()) {
+                                                    $fail('File cover tidak ditemukan di server. Silakan pilih dan upload ulang.');
+                                                    return;
+                                                }
+                                                if ($value->getSize() > 10 * 1024 * 1024) {
+                                                    $fail('Ukuran file cover tidak boleh lebih dari 10MB.');
+                                                    return;
+                                                }
+                                                $allowedMimes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+                                                if (!in_array($value->getMimeType(), $allowedMimes)) {
+                                                    $fail('Tipe file cover tidak didukung (harus jpeg, png, jpg, atau webp).');
+                                                    return;
+                                                }
+                                            } catch (\Exception $e) {
+                                                $fail('Gagal memproses file cover: ' . $e->getMessage());
+                                                return;
+                                            }
+                                        }
+                                    };
+                                }
+                            ]),
 
                         SpatieMediaLibraryFileUpload::make('full_narration')
                             ->label('Audio Narasi Lengkap (.mp3 / .wav)')
                             ->collection('full_narration')
                             ->disk('public')
-                            ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/mp3'])
-                            ->maxSize(50 * 1024) // 50MB
-                            ->required(),
+                            ->required()
+                            ->rules([
+                                function () {
+                                    return function (string $attribute, $value, \Closure $fail) {
+                                        if (is_string($value) && (str_contains($value, 'livewire-tmp') || empty($value))) {
+                                            $fail('File audio narasi tidak valid atau gagal diupload. Silakan pilih dan upload ulang file Anda.');
+                                            return;
+                                        }
+
+                                        if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                                            try {
+                                                if (!$value->exists()) {
+                                                    $fail('File audio narasi tidak ditemukan di server. Silakan pilih dan upload ulang.');
+                                                    return;
+                                                }
+                                                if ($value->getSize() > 50 * 1024 * 1024) {
+                                                    $fail('Ukuran file audio narasi tidak boleh lebih dari 50MB.');
+                                                    return;
+                                                }
+                                                $allowedMimes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'application/octet-stream'];
+                                                if (!in_array($value->getMimeType(), $allowedMimes)) {
+                                                    $fail('Tipe file audio narasi tidak didukung (harus mp3 atau wav).');
+                                                    return;
+                                                }
+                                            } catch (\Exception $e) {
+                                                $fail('Gagal memproses file audio narasi: ' . $e->getMessage());
+                                                return;
+                                            }
+                                        }
+                                    };
+                                }
+                            ]),
 
                         SpatieMediaLibraryFileUpload::make('full_animation')
                             ->label('Video Animasi Lengkap (.mp4) — Opsional')
                             ->collection('full_animation')
                             ->disk('public')
-                            ->acceptedFileTypes(['video/mp4'])
-                            ->maxSize(500 * 1024) // 500MB
                             ->helperText('Upload file .mp4. Maksimum 500MB. Jika tidak ada video, cerita akan tampil dengan teks saja.')
-                            ->nullable(),
+                            ->nullable()
+                            ->rules([
+                                function () {
+                                    return function (string $attribute, $value, \Closure $fail) {
+                                        if (is_string($value) && str_contains($value, 'livewire-tmp')) {
+                                            $fail('File video animasi tidak valid atau gagal diupload. Silakan pilih dan upload ulang file Anda.');
+                                            return;
+                                        }
+
+                                        if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                                            try {
+                                                if (!$value->exists()) {
+                                                    $fail('File video animasi tidak ditemukan di server. Silakan pilih dan upload ulang.');
+                                                    return;
+                                                }
+                                                if ($value->getSize() > 500 * 1024 * 1024) {
+                                                    $fail('Ukuran file video animasi tidak boleh lebih dari 500MB.');
+                                                    return;
+                                                }
+                                                $allowedMimes = ['video/mp4', 'application/octet-stream'];
+                                                if (!in_array($value->getMimeType(), $allowedMimes)) {
+                                                    $fail('Tipe file video animasi tidak didukung (harus mp4).');
+                                                    return;
+                                                }
+                                            } catch (\Exception $e) {
+                                                $fail('Gagal memproses file video animasi: ' . $e->getMessage());
+                                                return;
+                                            }
+                                        }
+                                    };
+                                }
+                            ]),
                     ])->columns(1),
 
             ]);
@@ -163,6 +262,10 @@ class StoryResource extends Resource
                 ToggleColumn::make('is_premium')
                     ->label('Premium'),
 
+                TextColumn::make('stars_required')
+                    ->label('Min. Bintang')
+                    ->sortable(),
+
                 TextColumn::make('order')
                     ->label('Urutan')
                     ->sortable(),
@@ -186,7 +289,8 @@ class StoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ReviewsRelationManager::class,
+            LikesRelationManager::class,
         ];
     }
 

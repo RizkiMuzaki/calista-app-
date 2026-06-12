@@ -9,7 +9,13 @@
 - [x] Voice Agent API (Typecast API Integration & Caching)
 - [x] Payment System (Tripay, Checkout, Callback Validation)
 - [x] Louvin Subscription Integration (Sync Plan IDs, prices, names, and fix missing reference SQL 500 error)
+- [x] Fix Story Upload crash when validation fails (Spatie Media Library & Livewire size retrieval crash)
 - [ ] Security Audit (Input Sanitization)
+- [x] Delete "Pulo Kemarau" story from database & Spatie Media library via migration (June 2026)
+- [x] Verify & Audited Louvin Webhook security and configuration (June 2026)
+- [x] Technical Debt Phase 2 Cleanup (Obsolete Web Views, Assets, and Controllers) (June 2026)
+
+
 
 ## 🟡 FRONTEND (FLUTTER)
 - [x] Onboarding & Walkthrough

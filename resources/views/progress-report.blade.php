@@ -41,9 +41,7 @@
   }
 
   .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    /* flexbox removed for DomPDF compatibility */
   }
 
   .brand {
@@ -76,9 +74,6 @@
     margin-top: 14px;
     padding-top: 14px;
     border-top: 1px solid rgba(255,255,255,0.25);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
 
   .child-name {
@@ -119,13 +114,10 @@
 
   /* ─── SUMMARY CARDS ─── */
   .summary-grid {
-    display: flex;
-    gap: 8px;
     margin-bottom: 4px;
   }
 
   .summary-card {
-    flex: 1;
     border-radius: 14px;
     padding: 12px 10px;
     text-align: center;
@@ -144,9 +136,6 @@
   /* ─── VAK BARS ─── */
   .vak-row {
     margin-bottom: 7px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
 
   .vak-label {
@@ -154,11 +143,9 @@
     font-size: 10px;
     font-weight: 700;
     color: #444;
-    flex-shrink: 0;
   }
 
   .vak-track {
-    flex: 1;
     background: #eee;
     border-radius: 99px;
     height: 12px;
@@ -175,7 +162,6 @@
     text-align: right;
     font-size: 10px;
     font-weight: 900;
-    flex-shrink: 0;
   }
 
   .fill-pink   { background: #E91E8C; }
@@ -194,23 +180,17 @@
 
   /* ─── DAILY ACTIVITY TABLE ─── */
   .activity-row {
-    display: flex;
-    gap: 4px;
-    align-items: flex-end;
     margin-bottom: 10px;
   }
 
   .day-col {
-    flex: 1;
     text-align: center;
   }
 
   .day-bar-wrap {
     height: 50px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
     margin-bottom: 3px;
+    text-align: center;
   }
 
   .day-bar {
@@ -277,22 +257,22 @@
 
   /* ─── MOOD CHIPS ─── */
   .mood-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
     margin-bottom: 8px;
   }
 
   .mood-chip {
+    display: inline-block;
     border-radius: 99px;
     padding: 5px 12px;
     font-size: 10px;
     font-weight: 700;
     border: 1.5px solid rgba(0,0,0,0.08);
+    margin-right: 6px;
+    margin-bottom: 6px;
   }
 
   .chip-senang    { background: #fffadc; color: #b8860b; }
-  .chip-penasaran { background: #f0eaff; color: #7B4FBE; }
+  .chip-ceria     { background: #f3e8ff; color: #A66CFF; }
   .chip-takut     { background: #ffe8e8; color: #c0392b; }
   .chip-sedih     { background: #e8f4ff; color: #2980b9; }
   .chip-marah     { background: #ffe8e8; color: #c0392b; }
@@ -345,31 +325,39 @@
      HEADER — Brand + Identitas Anak
 ══════════════════════════════════════════════════ --}}
 <div class="header">
-  <div class="header-top">
-    <div>
-      <div class="brand">✨ CALISTA</div>
-      <div class="brand-sub">LAPORAN BELAJAR ANAK</div>
-    </div>
-    <div class="header-date">
-      <div>Dicetak</div>
-      <div class="date-value">{{ $printDate }}</div>
-    </div>
-  </div>
+  <table style="width: 100%; border-collapse: collapse; border: 0;">
+    <tr>
+      <td style="width: 50%; vertical-align: top; border: 0; padding: 0;">
+        <div class="brand">✨ CALISTA</div>
+        <div class="brand-sub">LAPORAN BELAJAR ANAK</div>
+      </td>
+      <td style="width: 50%; text-align: right; vertical-align: top; border: 0; padding: 0;">
+        <div class="header-date">
+          <div>Dicetak</div>
+          <div class="date-value">{{ $printDate }}</div>
+        </div>
+      </td>
+    </tr>
+  </table>
 
-  <div class="child-info">
-    <div>
-      <div class="child-name">🧒 {{ $child['nama'] }}</div>
-      <div class="child-meta">
-        Umur {{ $child['umur'] ?? '-' }} tahun
-        &nbsp;·&nbsp;
-        Bergabung sejak {{ $child['join_date'] }}
-      </div>
-    </div>
-    <div class="period-badge">
-      📅 {{ $periodLabel }}<br>
-      <span style="font-weight:400; font-size:9px;">{{ $period['start_date'] }} — {{ $period['end_date'] }}</span>
-    </div>
-  </div>
+  <table style="width: 100%; border-collapse: collapse; border: 0; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.25);">
+    <tr>
+      <td style="vertical-align: middle; border: 0; padding: 0;">
+        <div class="child-name">🧒 {{ $child['nama'] }}</div>
+        <div class="child-meta">
+          Umur {{ $child['umur'] ?? '-' }} tahun
+          &nbsp;·&nbsp;
+          Bergabung sejak {{ $child['join_date'] }}
+        </div>
+      </td>
+      <td style="text-align: right; vertical-align: middle; border: 0; padding: 0; width: 220px;">
+        <div class="period-badge" style="display: block; float: right;">
+          📅 {{ $periodLabel }}<br>
+          <span style="font-weight:400; font-size:9px;">{{ $period['start_date'] }} — {{ $period['end_date'] }}</span>
+        </div>
+      </td>
+    </tr>
+  </table>
 </div>
 
 
@@ -378,33 +366,45 @@
 ══════════════════════════════════════════════════ --}}
 <div class="section-title">📊 Ringkasan Periode Ini</div>
 
-<div class="summary-grid">
-  <div class="summary-card card-pink">
-    <span class="emoji">🎮</span>
-    <span class="value">{{ $summary['total_sessions'] }}</span>
-    <span class="label">Sesi Main</span>
-  </div>
-  <div class="summary-card card-gold">
-    <span class="emoji">⏱️</span>
-    <span class="value">{{ number_format($summary['total_play_minutes'], 1) }}</span>
-    <span class="label">Menit Belajar</span>
-  </div>
-  <div class="summary-card card-teal">
-    <span class="emoji">🏆</span>
-    <span class="value">{{ number_format($summary['avg_score'], 1) }}</span>
-    <span class="label">Rata-rata Skor</span>
-  </div>
-  <div class="summary-card card-purple">
-    <span class="emoji">⭐</span>
-    <span class="value">{{ $summary['earned_stars'] }}</span>
-    <span class="label">Bintang</span>
-  </div>
-  <div class="summary-card card-green">
-    <span class="emoji">✅</span>
-    <span class="value">{{ $summary['completion_rate'] }}%</span>
-    <span class="label">Selesai</span>
-  </div>
-</div>
+<table style="width: 100%; border-collapse: collapse; border: 0; margin-bottom: 4px;">
+  <tr>
+    <td style="width: 20%; padding: 0 4px 0 0; border: 0;">
+      <div class="summary-card card-pink">
+        <span class="emoji">🎮</span>
+        <span class="value">{{ $summary['total_sessions'] }}</span>
+        <span class="label">Sesi Main</span>
+      </div>
+    </td>
+    <td style="width: 20%; padding: 0 4px; border: 0;">
+      <div class="summary-card card-gold">
+        <span class="emoji">⏱️</span>
+        <span class="value">{{ number_format($summary['total_play_minutes'], 1) }}</span>
+        <span class="label">Menit Belajar</span>
+      </div>
+    </td>
+    <td style="width: 20%; padding: 0 4px; border: 0;">
+      <div class="summary-card card-teal">
+        <span class="emoji">🏆</span>
+        <span class="value">{{ number_format($summary['avg_score'], 1) }}</span>
+        <span class="label">Rata-rata Skor</span>
+      </div>
+    </td>
+    <td style="width: 20%; padding: 0 4px; border: 0;">
+      <div class="summary-card card-purple">
+        <span class="emoji">⭐</span>
+        <span class="value">{{ $summary['earned_stars'] }}</span>
+        <span class="label">Bintang</span>
+      </div>
+    </td>
+    <td style="width: 20%; padding: 0 0 0 4px; border: 0;">
+      <div class="summary-card card-green">
+        <span class="emoji">✅</span>
+        <span class="value">{{ $summary['completion_rate'] }}%</span>
+        <span class="label">Selesai</span>
+      </div>
+    </td>
+  </tr>
+</table>
 
 
 {{-- ══════════════════════════════════════════════════
@@ -414,27 +414,35 @@
 
 <div class="box">
 @if($learningStyle['has_data'])
-  <div class="vak-row">
-    <div class="vak-label">👁️ Visual</div>
-    <div class="vak-track">
-      <div class="vak-fill fill-pink" style="width: {{ $learningStyle['visual'] }}%;"></div>
-    </div>
-    <div class="vak-pct" style="color:#E91E8C;">{{ $learningStyle['visual'] }}%</div>
-  </div>
-  <div class="vak-row">
-    <div class="vak-label">👂 Auditori</div>
-    <div class="vak-track">
-      <div class="vak-fill fill-gold" style="width: {{ $learningStyle['auditory'] }}%;"></div>
-    </div>
-    <div class="vak-pct" style="color:#d48900;">{{ $learningStyle['auditory'] }}%</div>
-  </div>
-  <div class="vak-row">
-    <div class="vak-label">🤸 Kinestetik</div>
-    <div class="vak-track">
-      <div class="vak-fill fill-teal" style="width: {{ $learningStyle['kinesthetic'] }}%;"></div>
-    </div>
-    <div class="vak-pct" style="color:#0a9a97;">{{ $learningStyle['kinesthetic'] }}%</div>
-  </div>
+  <table style="width: 100%; border-collapse: collapse; border: 0;">
+    <tr>
+      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">👁️ Visual</td>
+      <td style="padding: 4px 0; border: 0; vertical-align: middle;">
+        <div class="vak-track" style="display: block; width: 100%;">
+          <div class="vak-fill fill-pink" style="width: {{ $learningStyle['visual'] }}%;"></div>
+        </div>
+      </td>
+      <td style="width: 45px; text-align: right; font-size: 10px; font-weight: 900; color:#E91E8C; padding: 4px 0; border: 0;">{{ $learningStyle['visual'] }}%</td>
+    </tr>
+    <tr>
+      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">👂 Auditori</td>
+      <td style="padding: 4px 0; border: 0; vertical-align: middle;">
+        <div class="vak-track" style="display: block; width: 100%;">
+          <div class="vak-fill fill-gold" style="width: {{ $learningStyle['auditory'] }}%;"></div>
+        </div>
+      </td>
+      <td style="width: 45px; text-align: right; font-size: 10px; font-weight: 900; color:#d48900; padding: 4px 0; border: 0;">{{ $learningStyle['auditory'] }}%</td>
+    </tr>
+    <tr>
+      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">🤸 Kinestetik</td>
+      <td style="padding: 4px 0; border: 0; vertical-align: middle;">
+        <div class="vak-track" style="display: block; width: 100%;">
+          <div class="vak-fill fill-teal" style="width: {{ $learningStyle['kinesthetic'] }}%;"></div>
+        </div>
+      </td>
+      <td style="width: 45px; text-align: right; font-size: 10px; font-weight: 900; color:#0a9a97; padding: 4px 0; border: 0;">{{ $learningStyle['kinesthetic'] }}%</td>
+    </tr>
+  </table>
   <div style="margin-top:8px; font-size:10px; color:#888;">
     💡 <em>Gaya belajar dominan anak: <strong class="highlight">{{ $learningStyle['dominant'] }}</strong></em>
   </div>
@@ -457,24 +465,26 @@
   $barColors = ['#E91E8C','#F5A623','#0ABFBC','#7B4FBE','#27AE60','#E91E8C','#F5A623'];
 @endphp
 
-<div class="activity-row">
-@foreach($daily as $i => $day)
-  @php
-    $heightPx = max(4, round(($day['play_minutes'] / $maxMin) * 50));
-    $color = $day['play_minutes'] > 0 ? ($barColors[$i % 7]) : '#e0e0e0';
-    $dayName = \Carbon\Carbon::parse($day['date'])->locale('id')->isoFormat('ddd');
-  @endphp
-  <div class="day-col">
-    <div class="day-bar-wrap">
-      <div class="day-bar" style="height:{{ $heightPx }}px; background:{{ $color }};"></div>
-    </div>
-    <div class="day-label">{{ $dayName }}</div>
-    <div class="day-min" style="color:{{ $color }};">
-      @if($day['play_minutes'] > 0){{ number_format($day['play_minutes'],1) }}m@else-@endif
-    </div>
-  </div>
-@endforeach
-</div>
+<table style="width: 100%; border-collapse: collapse; border: 0; margin-bottom: 10px;">
+  <tr>
+  @foreach($daily as $i => $day)
+    @php
+      $heightPx = max(4, round(($day['play_minutes'] / $maxMin) * 50));
+      $color = $day['play_minutes'] > 0 ? ($barColors[$i % 7]) : '#e0e0e0';
+      $dayName = \Carbon\Carbon::parse($day['date'])->locale('id')->isoFormat('ddd');
+    @endphp
+    <td style="width: {{ 100 / count($daily) }}%; text-align: center; border: 0; padding: 0; vertical-align: bottom;">
+      <div class="day-bar-wrap">
+        <div class="day-bar" style="height:{{ $heightPx }}px; background:{{ $color }}; margin: 0 auto; display: block;"></div>
+      </div>
+      <div class="day-label">{{ $dayName }}</div>
+      <div class="day-min" style="color:{{ $color }};">
+        @if($day['play_minutes'] > 0){{ number_format($day['play_minutes'],1) }}m@else-@endif
+      </div>
+    </td>
+  @endforeach
+  </tr>
+</table>
 
 <table class="data-table" style="margin-top:4px;">
   <tr>
@@ -550,14 +560,14 @@
 @php
   $moodEmoji = [
     'senang'    => '😄',
-    'penasaran' => '🤔',
+    'ceria'     => '🤩',
     'takut'     => '😰',
     'sedih'     => '😢',
     'marah'     => '😡',
   ];
   $moodLabel = [
     'senang'    => 'Senang',
-    'penasaran' => 'Penasaran',
+    'ceria'     => 'Ceria',
     'takut'     => 'Takut',
     'sedih'     => 'Sedih',
     'marah'     => 'Marah',
@@ -568,7 +578,7 @@
 
 @if($totalMoodEntries > 0)
 <div class="mood-chips">
-  @foreach(['senang','penasaran','takut','sedih','marah'] as $moodKey)
+  @foreach(['senang','ceria','takut','sedih','marah'] as $moodKey)
   @php $cnt = (int)($moodSummary[$moodKey] ?? 0); @endphp
   <div class="mood-chip chip-{{ $moodKey }}" style="{{ $cnt == 0 ? 'opacity:0.4' : '' }}">
     {{ $moodEmoji[$moodKey] }} {{ $moodLabel[$moodKey] }}

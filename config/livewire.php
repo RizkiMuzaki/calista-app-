@@ -64,8 +64,8 @@ return [
     */
 
     'temporary_file_upload' => [
-        'disk' => 'public',    // Gunakan disk public agar temp file bisa diakses
-        'rules' => ['required', 'file', 'max:524288'], // Max 512MB (524288 KB) — cukup untuk video .mp4
+        'disk' => null,
+        'rules' => ['file', 'max:524288'], // Max 512MB (524288 KB) — cukup untuk video .mp4
         'directory' => 'livewire-tmp',
         'middleware' => null,  // Example: 'throttle:5,1'             | Default: 'throttle:60,1'
         'preview_mimes' => [   // Supported file types for temporary pre-signed file URLs...

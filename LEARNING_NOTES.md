@@ -84,6 +84,36 @@ _channel.stream.listen((message) {
   3. Synced `PlanSeeder.php` to seed the exact prices and names (e.g. `Calista Edu Plan Mingguan` at `26000`, `Calista Plus Bulanan` at `130000`, and `Calista Plus Tahunan` at `866000`), then purged and re-seeded the database.
   4. Updated hardcoded display prices in Flutter's `premium_subscription_modal.dart` (`Rp 26.000` for weekly and `Rp 130.000` for monthly) to prevent user pricing mismatch display.
 
+### 10. Livewire/Filament Spatie Media Library Upload Size Crash Fix (June 2026)
+- **Problem**: Jika validasi form gagal (misal: duplikasi slug dongeng), Livewire melakukan re-render. Selama re-render ini, file temporary yang sudah terupload dibersihkan atau dipindahkan dari path aslinya. Validasi berikutnya mencoba mengecek file size atau mime type pada path temporary (yang ter-fallback menjadi `livewire-tmp/livewire-tmp`), menyebabkan Flysystem melempar exception fatal `UnableToRetrieveMetadata` yang memicu HTTP 500 alih-alih menampilkan error validasi normal.
+- **Solution**:
+  1. Mengkonfigurasi Spatie Media Library secara proaktif di [Story.php](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/app/Models/Story.php) menggunakan `singleFile()` pada koleksi `cover`, `full_narration`, dan `full_animation`.
+  2. Menghapus validator default `maxSize()` dan `acceptedFileTypes()` di [StoryResource.php](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/app/Filament/Resources/StoryResource.php) yang memicu panggilan langsung ke metadata Flysystem.
+  3. Menggantinya dengan custom validation rules menggunakan penanganan `try-catch`. Jika path temporary corrupt/hilang, validator akan menangkap exception secara aman dan melempar pesan error validasi yang bersih ke UI ("File tidak valid atau gagal diupload. Silakan upload ulang.") alih-alih membuat server crash 500.
+
+### 11. Star Reward Lock, Instant Tap Interaction, and Random Chest Celebration (June 2026)
+- **Problem**: 
+  1. Baju "Sahabat Gajah" (Nusa Elephant Ranger) tidak sinkron antara logika perolehan (12 bintang via chest) dengan database seeder dan model subscription (weekly bonus) yang memicu status auto-unlock instan.
+  2. Klik item yang sudah dimiliki dan item premium terkunci mengalami delay karena membuka detail screen terlebih dahulu.
+  3. Efek visual saat equip baju dinilai monoton dan kurang menyerupai sensasi membuka peti harta karun (chest).
+  4. Frame gameplay level 4 counting berwarna hijau bertabrakan dengan visual identity game.
+- **Solution**:
+  1. **Backend Database & Seeder**: Menambahkan `star_reward` ke kolom ENUM `unlock_type` pada tabel `character_items` menggunakan raw migration query, memodifikasi `CharacterItemSeeder` agar Nusa Elephant Ranger bertipe `star_reward` dengan syarat 12 bintang, serta membersihkan record existing kepemilikannya.
+  2. **Subscription & Shop Controller**: Mengalihkan bonus plan mingguan ke `Nusa Panda Scout`, dan memperbarui `claimReward` untuk memvalidasi akumulasi `sum('bintang')` dari progres belajar anak di backend.
+  3. **Instant Tap Interaction**: Memodifikasi handler `_openDetail` di mobile agar mem-bypass detail screen; owned items langsung di-equip secara instan, dan locked premium items langsung memicu modal subscription.
+  4. **Silent Claim untuk Star Reward**: Jika anak memiliki $\ge 12$ bintang tapi item belum ter-claim di database, client memicu silent POST `/api/shop/claim` before melakukan equip untuk menghindari error 404.
+  5. **Random Chest Background & Animation**: Memperbarui visual perayaan equip dengan rotating sweep gradient, pulsing glow, dan pemilihan background chest secara acak dari folder asset (`6.webp`, `7.webp`, `8.webp`).
+  6. **Visual Gameplay**: Mengubah accent color level 4 counting dari hijau (`0xFF7BD88F`) menjadi pink (`0xFFFF5E9A`).
+
+### 12. Deletion of Story "Pulo Kemarau" and Louvin Webhook Verification (June 2026)
+- **Problem**:
+  1. Dongeng "Pulo Kemarau" harus dihapus bersih dari database beserta seluruh file media-nya.
+  2. Perlu memverifikasi keamanan dan integritas penanganan webhook dari Louvin.
+- **Solution**:
+  1. **Story Deletion Migration**: Dibuat database migration `2026_06_10_104500_delete_pulo_kemarau_story.php` yang memanggil delete melalui Eloquent model `Story::where(...)` untuk memastikan event lifecycle `deleting` terpicu. Hal ini menjamin file media Spatie (cover, audio narasi, video animasi) di storage terhapus bersih dari disk, selain menghapus record relasi (pages, progress, reviews, likes) melalui constraint database `cascadeOnDelete`.
+  2. **Louvin Webhook Audit**: Memverifikasi `louvinWebhook` di `SubscriptionController.php` aman menggunakan `hash_equals` timing-attack-resistant token verification. Jalur route `/api/payments/louvin/webhook` berada di luar proteksi middleware Sanctum dan CSRF secara default (aman untuk third-party API callbacks).
+
 ---
 *Next Topic Idea: State Management, Cache Invalidation & API Middleware Performance.*
+
 

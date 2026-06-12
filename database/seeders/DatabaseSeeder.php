@@ -16,11 +16,13 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'ELANORA',
-            'email' => 'elanoraadmin@gmail.com',
-            'password' => bcrypt('09425863'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'elanoraadmin@gmail.com'],
+            [
+                'name' => 'ELANORA',
+                'password' => bcrypt('09425863'),
+            ]
+        );
 
     $this->call([
         PlanSeeder::class,
