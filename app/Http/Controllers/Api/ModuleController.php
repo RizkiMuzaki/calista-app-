@@ -88,8 +88,14 @@ class ModuleController extends Controller
                 ->where('user_id', $user->id)
                 ->exists();
 
-            if ($canShowProgress) {
-                $levels = $levels->map(function ($level) use ($anakId) {
+            $hasActiveSub = $user ? $user->hasActiveSubscription() : false;
+
+            // Map levels untuk menambahkan properti is_locked dan progress
+            $levels = $levels->map(function ($level, $index) use ($anakId, $canShowProgress, $hasActiveSub) {
+                // Level ke-3 ke atas (index >= 2) dikunci jika user bukan premium
+                $level->is_locked = !$hasActiveSub && ($index >= 2);
+
+                if ($canShowProgress) {
                     $progress = $level->progresAnaks()
                         ->where('anak_id', $anakId)
                         ->first();
@@ -105,10 +111,12 @@ class ModuleController extends Controller
                         'duration_seconds' => $progress->duration_seconds,
                         'last_played_at' => $progress->last_played_at,
                     ] : null;
+                } else {
+                    $level->progress = null;
+                }
 
-                    return $level;
-                });
-            }
+                return $level;
+            });
 
             return response()->json([
                 'success' => true,
@@ -154,6 +162,20 @@ class ModuleController extends Controller
             $level = $module->levels()->where('id', $levelId)->first();
             if (!$level) {
                 return response()->json(['success' => false, 'message' => 'Level tidak ditemukan dalam modul ini'], 404);
+            }
+
+            // Proteksi premium: kunci level 3 ke atas (index >= 2) untuk user non-aktif subscription
+            $user = request()->user('sanctum');
+            $hasActiveSub = $user ? $user->hasActiveSubscription() : false;
+            if (!$hasActiveSub) {
+                $levels = $module->levels()->orderBy('order_number')->get();
+                $levelIndex = $levels->pluck('id')->indexOf((int)$levelId);
+                if ($levelIndex !== false && $levelIndex >= 2) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Level ini adalah konten premium. Silakan berlangganan terlebih dahulu.'
+                    ], 403);
+                }
             }
 
             // Pilih tabel konten berdasarkan slug modul
