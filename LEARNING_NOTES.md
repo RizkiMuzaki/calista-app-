@@ -121,6 +121,14 @@ _channel.stream.listen((message) {
   1. Menambahkan `$middleware->trustProxies(at: '*');` pada [bootstrap/app.php](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/bootstrap/app.php) agar Laravel mengenali header proxy dengan benar (`X-Forwarded-Proto`).
   2. Menambahkan `client_max_body_size 512M;` ke dalam file [nginx.conf](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/nginx.conf) agar web server mengizinkan upload media file berukuran besar hingga 512MB (sesuai limit max di livewire config).
 
+### 14. Missing Storage Symlink (404 Uploads) & Unstarted Queue Worker (0% Stuck TTS) (June 2026)
+- **Problem**:
+  1. Halaman admin panel menunjukkan gambar cover yang pecah, dan ketika diakses oleh aplikasi (misalnya `/storage/1/abc.jpg`), server melempar error `404 Not Found`. Hal ini disebabkan karena perintah `php artisan storage:link` belum dieksekusi di dalam kontainer Docker/Coolify untuk membuat tautan simbolik `public/storage` ke `storage/app/public`.
+  2. Proses pembuatan paket suara Nusa (generate audio pack) stuck di `0.0%` tanpa kemajuan di Flutter. Hal ini disebabkan karena Laravel menggunakan `QUEUE_CONNECTION=database`, namun tidak ada antrean pekerja (`queue worker`) yang berjalan di server untuk memproses pekerjaan `GenerateChildTtsPack` di database.
+- **Solution**:
+  1. Mengubah berkas [nixpacks.toml](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/nixpacks.toml) pada bagian start command dengan menyisipkan perintah `php artisan storage:link --force` agar tautan simbolik direktori penyimpanan otomatis terbuat/diperbarui setiap kali kontainer dinyalakan.
+  2. Menyisipkan perintah `php artisan queue:work --daemon --tries=3 &` di latar belakang (background process) pada start command [nixpacks.toml](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/nixpacks.toml) untuk memproses semua job Laravel secara otomatis tanpa harus memicu worker manual.
+
 ---
 *Next Topic Idea: State Management, Cache Invalidation & API Middleware Performance.*
 

@@ -6,4 +6,4 @@ cmds = [
 ]
 
 [start]
-cmd = "chmod -R 777 storage bootstrap/cache && php-fpm -y /assets/php-fpm.conf & nginx -c /app/nginx.conf"
+cmd = "chmod -R 777 storage bootstrap/cache && php artisan storage:link --force && php artisan queue:work --daemon --tries=3 & php-fpm -y /assets/php-fpm.conf & nginx -c /app/nginx.conf"
