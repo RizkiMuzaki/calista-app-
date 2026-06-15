@@ -29,20 +29,32 @@ class AiCreditService
             return $this->planConfig('free');
         }
 
+        // Prioritas 1: cek durasi_bulan dari Plan model (lebih reliable dari string matching nama)
+        $durasi = (int) ($subscription->plan->durasi_bulan ?? 0);
+        if ($durasi > 0) {
+            if ($durasi <= 0) {
+                // trial / unlimited
+                return $this->planConfig('yearly');
+            }
+            // Durasi <= 7 hari (dikonversi ke bulan fraksional) → weekly
+            // Karena durasi_bulan biasanya integer (1, 3, 12), cek nama sebagai fallback
+        }
+
+        // Prioritas 2: string match pada nama paket (case-insensitive)
         $name = mb_strtolower($subscription->plan->nama_paket ?? '', 'UTF-8');
         if (str_contains($name, 'mingguan') || str_contains($name, 'weekly')) {
             return $this->planConfig('weekly');
         }
-
-        if (str_contains($name, 'bulanan') || str_contains($name, 'monthly')) {
+        if (str_contains($name, 'tahunan') || str_contains($name, 'yearly') || $durasi >= 12) {
+            return $this->planConfig('yearly');
+        }
+        if (str_contains($name, 'bulanan') || str_contains($name, 'monthly') || $durasi >= 1) {
             return $this->planConfig('monthly');
         }
 
-        if (str_contains($name, 'tahunan') || str_contains($name, 'yearly')) {
-            return $this->planConfig('yearly');
-        }
-
-        return $this->planConfig('free');
+        // Prioritas 3: user punya subscription aktif → minimal monthly (JANGAN return free)
+        // Ini mencegah 403 bila nama_paket tidak match keyword manapun
+        return $this->planConfig('monthly');
     }
 
     public function canSpend(?User $user, int $credits): array
