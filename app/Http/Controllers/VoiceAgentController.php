@@ -187,14 +187,8 @@ class VoiceAgentController extends Controller
         try {
             $user = auth()->user();
 
-            // 🆓 Blokir Akses Voice untuk User Free
-            $plan = $this->credits->planFor($user);
-            if ($plan['code'] === 'free') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Fitur Voice Tutor Nusa eksklusif untuk member Calista Plus. Yuk berlangganan!',
-                ], 403);
-            }
+            // ✅ TTS konten (audio pack, modul) terbuka untuk semua user
+            // Premium block hanya di processVoice() dan textChat() (fitur AI interaktif)
             $audio = $this->tts->synthesize(
                 $validated['text'],
                 auth()->user(),
