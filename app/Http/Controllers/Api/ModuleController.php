@@ -169,7 +169,7 @@ class ModuleController extends Controller
             $hasActiveSub = $user ? $user->hasActiveSubscription() : false;
             if (!$hasActiveSub) {
                 $levels = $module->levels()->orderBy('order_number')->get();
-                $levelIndex = $levels->pluck('id')->indexOf((int)$levelId);
+                $levelIndex = $levels->pluck('id')->search((int)$levelId);
                 if ($levelIndex !== false && $levelIndex >= 2) {
                     return response()->json([
                         'success' => false,
