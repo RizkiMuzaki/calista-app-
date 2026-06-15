@@ -19,6 +19,14 @@ class AiCreditService
             return $this->planConfig('free');
         }
 
+        // Admin/developer emails override for unlimited testing
+        $adminEmails = ['rizkimzk@gmail.com', 'calista.eduapp@gmail.com', 'testbunda@calista.com'];
+        if (in_array(mb_strtolower($user->email, 'UTF-8'), $adminEmails)) {
+            $plan = $this->planConfig('monthly');
+            $plan['limit'] = 99999999;
+            return $plan;
+        }
+
         $subscription = $user->subscriptions()
             ->with('plan')
             ->active()
