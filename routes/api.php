@@ -12,6 +12,16 @@ use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\MoodController; // 🆕 Mood Tracking
 use App\Http\Controllers\Api\StoryApiController;
 
+Route::get('/debug-log', function () {
+    $logPath = storage_path('logs/laravel.log');
+    if (!file_exists($logPath)) {
+        return response()->json(['message' => 'Log file not found'], 404);
+    }
+    $file = file($logPath);
+    $lastLines = array_slice($file, -150);
+    return response(implode("", $lastLines))->header('Content-Type', 'text/plain');
+});
+
 // Public routes (tidak perlu autentikasi)
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
