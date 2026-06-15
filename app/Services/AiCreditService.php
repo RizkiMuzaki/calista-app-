@@ -38,6 +38,10 @@ class AiCreditService
             return $this->planConfig('monthly');
         }
 
+        if (str_contains($name, 'tahunan') || str_contains($name, 'yearly')) {
+            return $this->planConfig('yearly');
+        }
+
         return $this->planConfig('free');
     }
 
@@ -96,7 +100,7 @@ class AiCreditService
     private function periodStart(array $plan): Carbon
     {
         return match ($plan['reset']) {
-            'weekly' => now()->startOfWeek(Carbon::MONDAY),
+            'weekly' => now()->startOfWeek(1),
             default => now()->startOfMonth(),
         };
     }
@@ -105,9 +109,10 @@ class AiCreditService
     {
         $plans = config('services.calista_ai.credit_plans', []);
         $defaults = [
-            'free' => ['code' => 'free', 'limit' => 0, 'reset' => 'monthly'],
-            'weekly' => ['code' => 'weekly', 'limit' => 30000, 'reset' => 'weekly'],
-            'monthly' => ['code' => 'monthly', 'limit' => 100000, 'reset' => 'monthly'],
+            'free' => ['code' => 'free', 'limit' => 35000, 'reset' => 'monthly'],
+            'weekly' => ['code' => 'weekly', 'limit' => 7000, 'reset' => 'weekly'],
+            'monthly' => ['code' => 'monthly', 'limit' => 12366, 'reset' => 'monthly'],
+            'yearly' => ['code' => 'yearly', 'limit' => 0, 'reset' => 'monthly'],
         ];
 
         return array_merge($defaults[$code] ?? $defaults['free'], $plans[$code] ?? []);
