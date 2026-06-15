@@ -129,12 +129,10 @@ _channel.stream.listen((message) {
   1. Mengubah berkas [nixpacks.toml](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/nixpacks.toml) pada bagian start command dengan menyisipkan perintah `php artisan storage:link --force` agar tautan simbolik direktori penyimpanan otomatis terbuat/diperbarui setiap kali kontainer dinyalakan.
   2. Menyisipkan perintah `php artisan queue:work --daemon --tries=3 &` di latar belakang (background process) pada start command [nixpacks.toml](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/nixpacks.toml) untuk memproses semua job Laravel secara otomatis tanpa harus memicu worker manual.
 
-### 15. Developer Credits Block during TTS Generation Testing (June 2026)
-- **Problem**: Pengujian berulang kali oleh developer memicu pembatasan kredit asisten AI lokal aplikasi (`credit_exhausted`). Total kuota karakter bulanan default pada paket Free (35.000 karakter) terlampaui di database, menyebabkan job `GenerateChildTtsPack` dibatalkan seketika setelah berjalan 114ms dengan pesan error: *"Pembuatan audio pack dibatalkan: kuota ElevenLabs habis."*
+### 15. Global Credit Limit Bypass for Onboarding TTS Generation (June 2026)
+- **Problem**: Pengujian berulang kali oleh developer memicu pembatasan kredit asisten AI lokal aplikasi (`credit_exhausted`) karena total kuota karakter terlampaui di database. Akibatnya, job `GenerateChildTtsPack` dibatalkan seketika setelah berjalan 114ms. Namun, karena file suara Nusa di awal wajib diunduh oleh semua pengguna (baik Free Plan maupun Premium) agar game modul bersuara, pembatasan lokal ini seharusnya tidak pernah memblokir proses onboarding/pembuatan paket audio anak.
 - **Solution**:
-  - Menambahkan pengecekan *admin/developer email override* pada [AiCreditService.php](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/app/Services/AiCreditService.php) agar email testing developer (`rizkimzk@gmail.com`, `calista.eduapp@gmail.com`, dan `testbunda@calista.com`) mendapatkan kuota uji coba yang sangat besar (99.999.999 karakter), sehingga terhindar dari pemblokiran limit lokal saat proses testing.
+  - Memodifikasi [AiCreditService.php](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/app/Services/AiCreditService.php) dan [ElevenLabsTtsService.php](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/app/Services/ElevenLabsTtsService.php) untuk meloloskan request berfitur `audio_pack_generation` secara global dari pengecekan sisa kredit. Sistem kini otomatis mengizinkan pembuatan paket suara awal untuk anak secara tidak terbatas bagi semua pengguna, sedangkan limitasi kredit bulanan tetap aktif memproteksi percakapan dinamis (Nusa Chat).
 
 ---
 *Next Topic Idea: State Management, Cache Invalidation & API Middleware Performance.*
-
-

@@ -57,8 +57,20 @@ class AiCreditService
         return $this->planConfig('monthly');
     }
 
-    public function canSpend(?User $user, int $credits): array
+    public function canSpend(?User $user, int $credits, string $feature = 'nusa_tts'): array
     {
+        if ($feature === 'audio_pack_generation') {
+            return [
+                'allowed' => true,
+                'plan' => 'unlimited_onboarding',
+                'limit' => 99999999,
+                'used' => 0,
+                'remaining' => 99999999,
+                'requested' => $credits,
+                'period_start' => now()->startOfMonth()->toDateString(),
+            ];
+        }
+
         $plan = $this->planFor($user);
         $used = $this->usedCredits($user, $plan);
         $remaining = max(0, $plan['limit'] - $used);
@@ -77,7 +89,7 @@ class AiCreditService
     public function recordSpend(?User $user, string $feature, string $text, array $metadata = []): array
     {
         $credits = $this->estimateElevenLabsCredits($text);
-        $guard = $this->canSpend($user, $credits);
+        $guard = $this->canSpend($user, $credits, $feature);
 
         if (!$guard['allowed']) {
             return $guard;

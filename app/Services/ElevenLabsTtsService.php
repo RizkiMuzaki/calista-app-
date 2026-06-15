@@ -21,7 +21,7 @@ class ElevenLabsTtsService
         }
 
         $requested = $this->credits->estimateElevenLabsCredits($cleanText);
-        $guard = $this->credits->canSpend($user, $requested);
+        $guard = $this->credits->canSpend($user, $requested, $feature);
         if (!$guard['allowed']) {
             return [
                 'success' => false,
