@@ -29,31 +29,23 @@ class AiCreditService
             return $this->planConfig('free');
         }
 
-        // Prioritas 1: cek durasi_bulan dari Plan model (lebih reliable dari string matching nama)
         $durasi = (int) ($subscription->plan->durasi_bulan ?? 0);
-        if ($durasi > 0) {
-            if ($durasi <= 0) {
-                // trial / unlimited
-                return $this->planConfig('yearly');
-            }
-            // Durasi <= 7 hari (dikonversi ke bulan fraksional) → weekly
-            // Karena durasi_bulan biasanya integer (1, 3, 12), cek nama sebagai fallback
-        }
-
-        // Prioritas 2: string match pada nama paket (case-insensitive)
         $name = mb_strtolower($subscription->plan->nama_paket ?? '', 'UTF-8');
+
+        // Cek weekly dulu (durasi pendek atau keyword)
         if (str_contains($name, 'mingguan') || str_contains($name, 'weekly')) {
             return $this->planConfig('weekly');
         }
+        // Tahunan
         if (str_contains($name, 'tahunan') || str_contains($name, 'yearly') || $durasi >= 12) {
             return $this->planConfig('yearly');
         }
+        // Bulanan
         if (str_contains($name, 'bulanan') || str_contains($name, 'monthly') || $durasi >= 1) {
             return $this->planConfig('monthly');
         }
 
-        // Prioritas 3: user punya subscription aktif → minimal monthly (JANGAN return free)
-        // Ini mencegah 403 bila nama_paket tidak match keyword manapun
+        // Fallback: user aktif berlangganan tapi nama tidak match → monthly (jangan pernah return free)
         return $this->planConfig('monthly');
     }
 
