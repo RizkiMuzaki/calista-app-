@@ -25,8 +25,7 @@ class Adm09425863PanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('adm09425863')
-            ->domain('dashboard.calista-mobile.my.id')
-            ->path('')
+            ->path('calista-admin')
             ->login()
             ->colors([
                 'primary' => Color::Blue,
