@@ -41,6 +41,7 @@
 - [x] Fix VoiceAgentController speech-to-text timeout issue
 - [x] Fix Audio Clipping for TTS and fallback audio overlapping
 - [x] Fix offline audio pack generation stuck at 0% (PHP CLI fallback when ZipArchive is missing, Flutter tolerance mode, and public disk path fix)
+- [x] Fix Livewire file upload signature mismatch & body size limit issues behind reverse proxy (June 2026)
 
 
 ## 🟢 VOICE AI OPTIMIZATION (COMPLETED)

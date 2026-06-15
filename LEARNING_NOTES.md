@@ -113,6 +113,14 @@ _channel.stream.listen((message) {
   1. **Story Deletion Migration**: Dibuat database migration `2026_06_10_104500_delete_pulo_kemarau_story.php` yang memanggil delete melalui Eloquent model `Story::where(...)` untuk memastikan event lifecycle `deleting` terpicu. Hal ini menjamin file media Spatie (cover, audio narasi, video animasi) di storage terhapus bersih dari disk, selain menghapus record relasi (pages, progress, reviews, likes) melalui constraint database `cascadeOnDelete`.
   2. **Louvin Webhook Audit**: Memverifikasi `louvinWebhook` di `SubscriptionController.php` aman menggunakan `hash_equals` timing-attack-resistant token verification. Jalur route `/api/payments/louvin/webhook` berada di luar proteksi middleware Sanctum dan CSRF secara default (aman untuk third-party API callbacks).
 
+### 13. Livewire File Upload Signature Mismatch & Body Size Limit behind Reverse Proxy (June 2026)
+- **Problem**: Saat upload cover story (dongeng) di admin panel, muncul error "failed to upload". Hal ini disebabkan oleh:
+  1. Server production berada di balik reverse proxy Coolify/Traefik yang melakukan SSL termination. Secara default, Laravel 11 tidak mempercayai proxy mana pun sehingga mendeteksi request scheme sebagai `http`. Di sisi lain, `URL::forceScheme('https')` di `AppServiceProvider.php` memaksa generator URL membuat link signed menggunakan `https`. Hal ini menyebabkan mismatch signature saat verifikasi routing temporary upload Livewire.
+  2. File upload dengan ukuran besar (seperti video narasi & animasi) akan diblokir oleh Nginx container bawaan Nixpacks karena batas default `client_max_body_size` bernilai 1M (1 Megabyte).
+- **Solution**:
+  1. Menambahkan `$middleware->trustProxies(at: '*');` pada [bootstrap/app.php](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/bootstrap/app.php) agar Laravel mengenali header proxy dengan benar (`X-Forwarded-Proto`).
+  2. Menambahkan `client_max_body_size 512M;` ke dalam file [nginx.conf](file:///d:/CALISTA%20MOBILE/calista_backend/CALISTA/nginx.conf) agar web server mengizinkan upload media file berukuran besar hingga 512MB (sesuai limit max di livewire config).
+
 ---
 *Next Topic Idea: State Management, Cache Invalidation & API Middleware Performance.*
 
