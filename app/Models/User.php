@@ -118,10 +118,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
      */
     public function hasActiveSubscription(): bool
     {
-        if (app()->environment('local')) {
-            return true;
-        }
-
         return $this->subscriptions()
             ->where('status', 'aktif')
             ->where('tanggal_berakhir', '>', now())

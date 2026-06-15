@@ -206,10 +206,21 @@ class AuthController extends Controller
                 ]
             );
 
+            $isNewUser = $user->wasRecentlyCreated;
+
             // If user existed but wasn't verified, mark as verified now
             if (!$user->email_verified_at) {
                 $user->email_verified_at = now();
                 $user->save();
+                $isNewUser = true;
+            }
+
+            if ($isNewUser) {
+                try {
+                    EmailService::sendWelcomeEmail($user->email, $user->name);
+                } catch (\Exception $e) {
+                    Log::error("Failed to send welcome email to {$user->email} via Google: " . $e->getMessage());
+                }
             }
 
             $token = $user->createToken('google_auth_token')->plainTextToken;

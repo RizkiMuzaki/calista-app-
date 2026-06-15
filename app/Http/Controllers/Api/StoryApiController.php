@@ -73,7 +73,7 @@ class StoryApiController extends Controller
                     'rating' => (double) $story->rating,
                     'age_group' => $story->age_group,
                     'duration' => $story->duration,
-                    'is_premium' => false, // Bypassed: force false for testing
+                    'is_premium' => (bool) $story->is_premium,
                     'stars_required' => (int) $story->stars_required,
                     'order' => (int) $story->order,
                     'cover_url' => $coverUrl,
@@ -106,8 +106,7 @@ class StoryApiController extends Controller
                 ->where('is_active', true)
                 ->firstOrFail();
  
-            // Lock premium stories for non-subscribers (Bypassed for testing)
-            /*
+            // Lock premium stories for non-subscribers
             if ($story->is_premium) {
                 if (!$user || !$user->hasActiveSubscription()) {
                     return response()->json([
@@ -116,7 +115,6 @@ class StoryApiController extends Controller
                     ], 403);
                 }
             }
-            */
  
             // Resolve assets
             $coverUrl = $this->resolveMediaUrl($story->getFirstMediaUrl('cover'));
@@ -151,7 +149,7 @@ class StoryApiController extends Controller
                     'rating' => (double) $story->rating,
                     'age_group' => $story->age_group,
                     'duration' => $story->duration,
-                    'is_premium' => false, // Bypassed: force false for testing
+                    'is_premium' => (bool) $story->is_premium,
                     'stars_required' => (int) $story->stars_required,
                     'full_script' => $story->full_script,
                     'cover_url' => $coverUrl,
