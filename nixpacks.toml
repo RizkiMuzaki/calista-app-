@@ -1,0 +1,6 @@
+# Nixpacks configuration to automate Laravel permissions on deploy
+[phases.build]
+cmds = [
+    "...",
+    "chmod -R 777 storage bootstrap/cache"
+]
