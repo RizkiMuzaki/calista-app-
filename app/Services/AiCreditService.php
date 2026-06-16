@@ -20,7 +20,8 @@ class AiCreditService
         }
 
         // Admin/developer emails override for unlimited testing
-        $adminEmails = ['rizkimzk@gmail.com', 'calista.eduapp@gmail.com', 'testbunda@calista.com'];
+        $adminEmailsEnv = env('CALISTA_ADMIN_EMAILS', 'rizkimzk@gmail.com,calista.eduapp@gmail.com,testbunda@calista.com');
+        $adminEmails = array_map('trim', explode(',', $adminEmailsEnv));
         if (in_array(mb_strtolower($user->email, 'UTF-8'), $adminEmails)) {
             $plan = $this->planConfig('monthly');
             $plan['limit'] = 99999999;

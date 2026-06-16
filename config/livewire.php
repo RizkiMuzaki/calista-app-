@@ -184,4 +184,25 @@ return [
     */
 
     'release_token' => 'a',
+
+    /*
+    |---------------------------------------------------------------------------
+    | Temporary File Uploads
+    |---------------------------------------------------------------------------
+    |
+    | Livewire handles file uploads by storing them in a temporary directory
+    | first. We increase the max limit to 500MB and upload time to 30 minutes
+    | to support large video (.mp4) and audio (.mp3) uploads in Filament.
+    |
+    */
+    'temporary_file_upload' => [
+        'disk' => 'local',
+        'rules' => ['file', 'max:512000'], // 500MB
+        'directory' => 'livewire-tmp',
+        'middleware' => null,
+        'preview_mimes' => [
+            'png', 'gif', 'jpg', 'jpeg', 'svg', 'mp4', 'mp3', 'wav',
+        ],
+        'max_upload_time' => 30, // 30 minutes
+    ],
 ];
