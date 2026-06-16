@@ -120,78 +120,16 @@ class StoryResource extends Resource
                             ->collection('cover')
                             ->disk('public')
                             ->required()
-                            ->rules([
-                                function () {
-                                    return function (string $attribute, $value, \Closure $fail) {
-                                        if (is_string($value) && (str_contains($value, 'livewire-tmp') || empty($value))) {
-                                            $fail('File cover tidak valid atau gagal diupload. Silakan pilih dan upload ulang file Anda.');
-                                            return;
-                                        }
-
-                                        if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                                            try {
-                                                \Illuminate\Support\Facades\Log::info('Cover upload debug', [
-                                                    'path' => $value->getPathname(),
-                                                    'exists' => $value->exists(),
-                                                ]);
-                                                if (!$value->exists()) {
-                                                    $fail('File cover tidak ditemukan di server. Silakan pilih dan upload ulang.');
-                                                    return;
-                                                }
-                                                if ($value->getSize() > 10 * 1024 * 1024) {
-                                                    $fail('Ukuran file cover tidak boleh lebih dari 10MB.');
-                                                    return;
-                                                }
-                                                $allowedMimes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-                                                if (!in_array($value->getMimeType(), $allowedMimes)) {
-                                                    $fail('Tipe file cover tidak didukung (harus jpeg, png, jpg, atau webp).');
-                                                    return;
-                                                }
-                                            } catch (\Exception $e) {
-                                                $fail('Gagal memproses file cover: ' . $e->getMessage());
-                                                return;
-                                            }
-                                        }
-                                    };
-                                }
-                            ]),
+                            ->image()
+                            ->maxSize(10240), // 10MB
 
                         SpatieMediaLibraryFileUpload::make('full_narration')
                             ->label('Audio Narasi Lengkap (.mp3 / .wav)')
                             ->collection('full_narration')
                             ->disk('public')
                             ->required()
-                            ->rules([
-                                function () {
-                                    return function (string $attribute, $value, \Closure $fail) {
-                                        if (is_string($value) && (str_contains($value, 'livewire-tmp') || empty($value))) {
-                                            $fail('File audio narasi tidak valid atau gagal diupload. Silakan pilih dan upload ulang file Anda.');
-                                            return;
-                                        }
-
-                                        if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                                            try {
-                                                if (!$value->exists()) {
-                                                    $fail('File audio narasi tidak ditemukan di server. Silakan pilih dan upload ulang.');
-                                                    return;
-                                                }
-                                                if ($value->getSize() > 50 * 1024 * 1024) {
-                                                    $fail('Ukuran file audio narasi tidak boleh lebih dari 50MB.');
-                                                    return;
-                                                }
-                                                $allowedMimes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'application/octet-stream'];
-                                                if (!in_array($value->getMimeType(), $allowedMimes)) {
-                                                    $fail('Tipe file audio narasi tidak didukung (harus mp3 atau wav).');
-                                                    return;
-                                                }
-                                            } catch (\Exception $e) {
-                                                $fail('Gagal memproses file audio narasi: ' . $e->getMessage());
-                                                return;
-                                            }
-                                        }
-                                    };
-                                }
-                            ]),
+                            ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/mp3', 'application/octet-stream'])
+                            ->maxSize(51200), // 50MB
 
                         SpatieMediaLibraryFileUpload::make('full_animation')
                             ->label('Video Animasi Lengkap (.mp4) — Opsional')
@@ -199,37 +137,8 @@ class StoryResource extends Resource
                             ->disk('public')
                             ->helperText('Upload file .mp4. Maksimum 500MB. Jika tidak ada video, cerita akan tampil dengan teks saja.')
                             ->nullable()
-                            ->rules([
-                                function () {
-                                    return function (string $attribute, $value, \Closure $fail) {
-                                        if (is_string($value) && str_contains($value, 'livewire-tmp')) {
-                                            $fail('File video animasi tidak valid atau gagal diupload. Silakan pilih dan upload ulang file Anda.');
-                                            return;
-                                        }
-
-                                        if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                                            try {
-                                                if (!$value->exists()) {
-                                                    $fail('File video animasi tidak ditemukan di server. Silakan pilih dan upload ulang.');
-                                                    return;
-                                                }
-                                                if ($value->getSize() > 500 * 1024 * 1024) {
-                                                    $fail('Ukuran file video animasi tidak boleh lebih dari 500MB.');
-                                                    return;
-                                                }
-                                                $allowedMimes = ['video/mp4', 'application/octet-stream'];
-                                                if (!in_array($value->getMimeType(), $allowedMimes)) {
-                                                    $fail('Tipe file video animasi tidak didukung (harus mp4).');
-                                                    return;
-                                                }
-                                            } catch (\Exception $e) {
-                                                $fail('Gagal memproses file video animasi: ' . $e->getMessage());
-                                                return;
-                                            }
-                                        }
-                                    };
-                                }
-                            ]),
+                            ->acceptedFileTypes(['video/mp4', 'application/octet-stream'])
+                            ->maxSize(512000), // 500MB
                     ])->columns(1),
 
             ]);
