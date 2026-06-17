@@ -29,7 +29,24 @@ class ChildController extends Controller
     public function index(Request $request)
     {
         try {
-            $children = Anak::where('user_id', $request->user()->id)
+            $user = $request->user();
+            $maxChildren = 1; // Default Free
+            
+            $activeSub = $user->subscriptions()
+                ->where('status', 'aktif')
+                ->where('tanggal_berakhir', '>', now())
+                ->with('plan')
+                ->first();
+                
+            if ($activeSub) {
+                if ($activeSub->plan && str_contains($activeSub->plan->nama_paket, 'Mingguan')) {
+                    $maxChildren = 2; // Weekly Plan
+                } else {
+                    $maxChildren = 100; // Monthly / Yearly
+                }
+            }
+
+            $children = Anak::where('user_id', $user->id)
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function (Anak $child) {
@@ -65,6 +82,7 @@ class ChildController extends Controller
                 'message' => 'Daftar anak berhasil diambil',
                 'data' => $children,
                 'total' => $children->count(),
+                'max_children' => $maxChildren,
             ], 200);
 
         } catch (\Exception $e) {
@@ -88,14 +106,30 @@ class ChildController extends Controller
     public function store(Request $request)
     {
         try {
-            // Batasan tambah anak untuk user Free
-            $childCount = Anak::where('user_id', $request->user()->id)->count();
-            $hasSubscription = $request->user()->hasActiveSubscription();
+            // Batasan tambah anak untuk user Free / Premium / Weekly
+            $user = $request->user();
+            $childCount = Anak::where('user_id', $user->id)->count();
             
-            if (!$hasSubscription && $childCount >= 1) {
+            $activeSub = $user->subscriptions()
+                ->where('status', 'aktif')
+                ->where('tanggal_berakhir', '>', now())
+                ->with('plan')
+                ->first();
+                
+            $maxChildren = 1; // Default Free
+            if ($activeSub) {
+                if ($activeSub->plan && str_contains($activeSub->plan->nama_paket, 'Mingguan')) {
+                    $maxChildren = 2; // Weekly
+                } else {
+                    $maxChildren = 100; // Monthly / Yearly
+                }
+            }
+            
+            if ($childCount >= $maxChildren) {
+                $planName = $activeSub ? ($activeSub->plan ? $activeSub->plan->nama_paket : 'Calista Plus') : 'Free';
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Batas maksimal penambahan anak untuk akun Free adalah 1 anak. Silakan tingkatkan ke Calista Plus untuk menambah lebih banyak anak.',
+                    'message' => "Batas maksimal penambahan anak untuk akun {$planName} adalah {$maxChildren} anak. Silakan tingkatkan paket Anda untuk menambah lebih banyak anak.",
                 ], 403);
             }
 
