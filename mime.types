@@ -70,6 +70,7 @@ types {
     application/xhtml+xml                            xhtml;
     application/xspf+xml                             xspf;
     application/zip                                  zip;
+    application/vnd.android.package-archive          apk;
 
     application/octet-stream                         bin exe dll;
     application/octet-stream                         deb;

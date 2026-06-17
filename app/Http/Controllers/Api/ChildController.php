@@ -88,6 +88,17 @@ class ChildController extends Controller
     public function store(Request $request)
     {
         try {
+            // Batasan tambah anak untuk user Free
+            $childCount = Anak::where('user_id', $request->user()->id)->count();
+            $hasSubscription = $request->user()->hasActiveSubscription();
+            
+            if (!$hasSubscription && $childCount >= 1) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Batas maksimal penambahan anak untuk akun Free adalah 1 anak. Silakan tingkatkan ke Calista Plus untuk menambah lebih banyak anak.',
+                ], 403);
+            }
+
             $validated = $request->validate([
                 'nama_anak' => 'required|string|max:255',
                 'tanggal_lahir' => 'required|date|before:today',
