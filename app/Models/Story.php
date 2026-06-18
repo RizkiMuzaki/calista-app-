@@ -34,6 +34,7 @@ class Story extends Model implements HasMedia
         'duration',
         'is_active',
         'is_premium',
+        'is_coming_soon',
         'stars_required',
         'order'
     ];
@@ -41,6 +42,7 @@ class Story extends Model implements HasMedia
     protected $casts = [
         'is_active' => 'boolean',
         'is_premium' => 'boolean',
+        'is_coming_soon' => 'boolean',
         'rating' => 'double',
         'stars_required' => 'integer',
         'order' => 'integer',

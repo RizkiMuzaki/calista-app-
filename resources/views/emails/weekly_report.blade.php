@@ -57,13 +57,13 @@
             <strong style="color: #EC4899; font-size: 24px; font-weight: 900; letter-spacing: 1px;">CALISTA</strong>
         </div>
         
-        <div class="header-tag">Laporan Belajar Mingguan</div>
+        <div class="header-tag">Laporan Belajar {{ $periodLabel ?? 'Mingguan' }}</div>
         <div class="title">Rangkuman Belajar {{ $anak->nama_anak }}</div>
 
         @if($hasSessions)
             <!-- Kartu Ringkasan Statistik -->
             <div class="card">
-                <div class="card-title" style="color: #EC4899;">📊 Statistik Minggu Ini</div>
+                <div class="card-title" style="color: #EC4899;">📊 Statistik {{ $statLabel ?? 'Minggu Ini' }}</div>
                 <table class="stats-table">
                     <tr>
                         <td class="stats-label">Sesi Bermain</td>
@@ -132,7 +132,7 @@
                 <div class="ai-banner">
                     <div class="ai-title">✨ Catatan Harapan Nusa (AI Insight)</div>
                     <div class="ai-text">
-                        “Tahukah Bunda? Saat mengobrol dengan Nusa minggu ini, 
+                        “Tahukah Bunda? Saat mengobrol dengan Nusa {{ ($period ?? 'week') === 'month' ? 'bulan ini' : 'minggu ini' }}, 
                         <strong>{{ $anak->nama_anak }}</strong> bercerita bahwa ia 
                         @if($anak->cita_cita) ingin sekali menjadi <strong>{{ $anak->cita_cita }}</strong>@endif
                         @if($anak->hobi) dan sangat suka meluangkan waktu untuk <strong>{{ $anak->hobi }}</strong>@endif.
@@ -158,7 +158,7 @@
             <div class="reminder-box">
                 <div class="reminder-title">Yuk, Mulai Bermain Lagi! 🌟</div>
                 <div class="reminder-text">
-                    Minggu ini <strong>{{ $anak->nama_anak }}</strong> belum sempat melakukan aktivitas belajar atau bermain game edukasi di Calista Mobile. 
+                    {{ ($period ?? 'week') === 'month' ? 'Bulan ini' : 'Minggu ini' }} <strong>{{ $anak->nama_anak }}</strong> belum sempat melakukan aktivitas belajar atau bermain game edukasi di Calista Mobile. 
                     Mari ajak si kecil meluangkan waktu 5-10 menit hari ini bersama Nusa untuk menjaga konsistensi belajarnya!
                 </div>
             </div>

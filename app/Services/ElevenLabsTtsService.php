@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 class ElevenLabsTtsService
@@ -18,6 +19,19 @@ class ElevenLabsTtsService
         $cleanText = $this->normalizeText($text);
         if ($cleanText === '') {
             throw new RuntimeException('Teks TTS kosong.');
+        }
+
+        $hash = hash('sha256', $cleanText . config('services.elevenlabs.nusa_voice_id'));
+        $cachePath = "tts-cache/{$hash}.mp3";
+
+        if (Storage::exists($cachePath)) {
+            return [
+                'success' => true,
+                'audio' => Storage::get($cachePath),
+                'content_type' => 'audio/mpeg',
+                'text' => $cleanText,
+                'credit' => ['cached' => true],
+            ];
         }
 
         $requested = $this->credits->estimateElevenLabsCredits($cleanText);
@@ -72,6 +86,9 @@ class ElevenLabsTtsService
             throw new RuntimeException('ElevenLabs TTS gagal.');
         }
 
+        $audioContent = $response->body();
+        Storage::put($cachePath, $audioContent);
+
         $spent = $this->credits->recordSpend($user, $feature, $cleanText, [
             'model' => config('services.elevenlabs.model_id'),
             'voice_id' => $voiceId,
@@ -80,7 +97,7 @@ class ElevenLabsTtsService
 
         return [
             'success' => true,
-            'audio' => $response->body(),
+            'audio' => $audioContent,
             'content_type' => $response->header('Content-Type') ?: 'audio/mpeg',
             'text' => $cleanText,
             'credit' => $spent,

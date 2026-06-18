@@ -1127,4 +1127,64 @@ class ProgressController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * POST /api/progress/{child_id}/report-email?period=week|month&date=YYYY-MM-DD
+     * Send progress report email to the parent.
+     */
+    public function sendReportEmail(Request $request, $childId)
+    {
+        try {
+            $user = $request->user();
+            if (!$user->hasActiveSubscription()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Kirim laporan email adalah fitur premium CALISTA. Silakan berlangganan terlebih dahulu.',
+                ], 403);
+            }
+
+            $anak = $this->findOwnedChild($request, $childId);
+            if (!$anak) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Anak tidak ditemukan atau bukan milik Anda',
+                ], 403);
+            }
+
+            $period = $request->input('period', 'week');
+            if (!in_array($period, ['week', 'month'], true)) {
+                $period = 'week';
+            }
+
+            $sent = \App\Services\EmailService::sendWeeklyReportEmail(
+                $user->email,
+                $user->name,
+                $anak,
+                true, // isManual = true
+                $period
+            );
+
+            if ($sent) {
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'Laporan belajar berhasil dikirim ke email Anda (' . $user->email . ').',
+                ]);
+            }
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mengirim email laporan belajar. Silakan coba beberapa saat lagi.',
+            ], 500);
+
+        } catch (\Exception $e) {
+            Log::error('Report email sending error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mengirim email: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

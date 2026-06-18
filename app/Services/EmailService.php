@@ -99,11 +99,12 @@ class EmailService
     }
 
     /**
-     * Send Weekly Learning Progress Report Email.
+     * Send Weekly/Monthly Learning Progress Report Email.
      */
-    public static function sendWeeklyReportEmail($to, $parentName, $anak, $isManual = false)
+    public static function sendWeeklyReportEmail($to, $parentName, $anak, $isManual = false, $period = 'week')
     {
-        $start = now()->subDays(7)->startOfDay();
+        $days = $period === 'month' ? 30 : 7;
+        $start = now()->subDays($days)->startOfDay();
         $end = now()->endOfDay();
 
         // Get sessions
@@ -123,11 +124,16 @@ class EmailService
         $earnedStars = $completedSessions->sum('bintang');
 
         $vak = self::_calculateVakFromSessions($sessions);
-        $recommendations = self::_generateWeeklyRecommendations($sessions, $vak);
+        $recommendations = self::_generateWeeklyRecommendations($sessions, $vak, $period);
 
-        $subject = $isManual 
-            ? "Laporan Belajar Anak: {$anak->nama_anak} (Dikirim Ulang) 📊"
-            : "Laporan Belajar Mingguan Calista Plus: {$anak->nama_anak} 📊";
+        $periodLabel = $period === 'month' ? 'Bulanan' : 'Mingguan';
+        $statLabel = $period === 'month' ? 'Bulan Ini' : 'Minggu Ini';
+
+        if ($isManual) {
+            $subject = "Laporan Belajar Anak: {$anak->nama_anak} (Dikirim Ulang) 📊";
+        } else {
+            $subject = "Laporan Belajar {$periodLabel} Calista Plus: {$anak->nama_anak} 📊";
+        }
 
         $htmlContent = view('emails.weekly_report', [
             'parentName' => $parentName,
@@ -139,6 +145,9 @@ class EmailService
             'earnedStars' => $earnedStars,
             'vak' => $vak,
             'recommendations' => $recommendations,
+            'periodLabel' => $periodLabel,
+            'statLabel' => $statLabel,
+            'period' => $period,
         ])->render();
 
         return self::send($to, $subject, $htmlContent);
@@ -204,7 +213,7 @@ class EmailService
         ];
     }
 
-    private static function _generateWeeklyRecommendations($sessions, $vak)
+    private static function _generateWeeklyRecommendations($sessions, $vak, $period = 'week')
     {
         $recommendations = [];
         $completedTotal = $sessions->where('status', 'completed')->count();
@@ -236,7 +245,8 @@ class EmailService
         }
 
         if (empty($recommendations)) {
-            $recommendations[] = "Progres belajar anak minggu ini sangat baik! Pertahankan konsistensi belajarnya ya Bun 🌟";
+            $periodText = $period === 'month' ? 'bulan ini' : 'minggu ini';
+            $recommendations[] = "Progres belajar anak {$periodText} sangat baik! Pertahankan konsistensi belajarnya ya Bun 🌟";
         }
 
         return $recommendations;

@@ -96,15 +96,19 @@ class AiCreditService
             return $guard;
         }
 
-        AiCreditUsage::create([
-            'user_id' => $user?->id,
-            'plan_code' => $guard['plan'],
-            'feature' => $feature,
-            'credits' => $credits,
-            'characters' => mb_strlen(trim($text), 'UTF-8'),
-            'period_start' => $guard['period_start'],
-            'metadata' => $metadata,
-        ]);
+        try {
+            AiCreditUsage::create([
+                'user_id' => $user?->id,
+                'plan_code' => $guard['plan'],
+                'feature' => $feature,
+                'credits' => $credits,
+                'characters' => mb_strlen(trim($text), 'UTF-8'),
+                'period_start' => $guard['period_start'],
+                'metadata' => $metadata,
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Failed to record credit usage: " . $e->getMessage());
+        }
 
         $guard['used'] += $credits;
         $guard['remaining'] = max(0, $guard['limit'] - $guard['used']);

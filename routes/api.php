@@ -80,12 +80,19 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}/audio-pack/status', [ChildController::class, 'audioPackStatus']);
         });
 
+        // Smart Audio Pack Routes
+        Route::prefix('audio-pack')->group(function () {
+            Route::get('/manifest', [\App\Http\Controllers\Api\AudioPackController::class, 'getManifest']);
+            Route::get('/name', [\App\Http\Controllers\Api\AudioPackController::class, 'getNameAudio']);
+        });
+
         // 📊 Progress API — Simpan & laporan progres belajar
         Route::prefix('progress')->group(function () {
             Route::post('/', [ProgressController::class, 'store']);          // 🆕 Simpan hasil belajar
             Route::get('/{child_id}/sessions', [ProgressController::class, 'sessionReport']); // Laporan sesi mingguan/bulanan
             Route::get('/{child_id}/sessions/export', [ProgressController::class, 'exportSessions']); // Download CSV laporan sesi
             Route::get('/{child_id}/report-pdf', [ProgressController::class, 'exportPdf']); // 📄 Download PDF laporan lengkap
+            Route::post('/{child_id}/report-email', [ProgressController::class, 'sendReportEmail']); // 📧 Kirim email laporan lengkap
             Route::get('/{child_id}', [ProgressController::class, 'report']); // 🆕 Laporan progres anak
             Route::get('/{child_id}/history', [ProgressController::class, 'history']); // 🆕 Riwayat lengkap (paginated)
         });

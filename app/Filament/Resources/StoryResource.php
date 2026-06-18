@@ -94,6 +94,10 @@ class StoryResource extends Resource
                             ->label('Premium / Berbayar')
                             ->default(false),
 
+                        Toggle::make('is_coming_soon')
+                            ->label('Coming Soon')
+                            ->default(false),
+
                         TextInput::make('stars_required')
                             ->label('Bintang Dibutuhkan')
                             ->numeric()
@@ -171,10 +175,13 @@ class StoryResource extends Resource
                 ToggleColumn::make('is_premium')
                     ->label('Premium'),
 
+                ToggleColumn::make('is_coming_soon')
+                    ->label('Coming Soon'),
+
                 TextColumn::make('stars_required')
                     ->label('Min. Bintang')
                     ->sortable(),
-
+                
                 TextColumn::make('order')
                     ->label('Urutan')
                     ->sortable(),
@@ -182,6 +189,7 @@ class StoryResource extends Resource
             ->filters([
                 TernaryFilter::make('is_active')->label('Aktif'),
                 TernaryFilter::make('is_premium')->label('Premium'),
+                TernaryFilter::make('is_coming_soon')->label('Coming Soon'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

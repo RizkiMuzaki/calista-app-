@@ -13,6 +13,10 @@ use Filament\Tables\Table;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Illuminate\Support\Number;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use App\Models\PlaySession;
+use App\Models\Mood;
 
 class AnakResource extends Resource
 {
@@ -172,6 +176,26 @@ class AnakResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('unduhLaporanMingguan')
+                        ->label('📄 PDF Mingguan')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('info')
+                        ->url(fn (Anak $record) => route('admin.anak.pdf', [
+                            'childId' => $record->id,
+                            'period'  => 'week',
+                        ]))
+                        ->openUrlInNewTab(),
+                    Tables\Actions\Action::make('unduhLaporanBulanan')
+                        ->label('📊 PDF Bulanan')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('warning')
+                        ->url(fn (Anak $record) => route('admin.anak.pdf', [
+                            'childId' => $record->id,
+                            'period'  => 'month',
+                        ]))
+                        ->openUrlInNewTab(),
+                ])->label('Laporan PDF')->icon('heroicon-o-document-chart-bar'),
                 Tables\Actions\Action::make('kirimLaporan')
                     ->label('Kirim Laporan')
                     ->icon('heroicon-o-envelope')
