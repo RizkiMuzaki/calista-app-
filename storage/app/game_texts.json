@@ -1,0 +1,1038 @@
+[
+  {
+    "key": "story_reading-zoo-1_slide_0",
+    "text": "Wah, lihat! Nusa dan [Nama] sudah sampai di Kebun Binatang! Hewan-hewan lucu sudah menunggu kita. Ayo masuk yuk!"
+  },
+  {
+    "key": "story_reading-zoo-1_slide_1",
+    "text": "Dengar baik-baik ya, [Nama]! Hewan-hewan akan memanggil kita dengan bunyi awal namanya. Lucu sekali!"
+  },
+  {
+    "key": "story_reading-zoo-1_slide_2",
+    "text": "Ayo bantu Nusa mencocokkan kartu hurufnya. Setiap jawaban benar akan membuka jalan ke kandang berikutnya. Semangat!"
+  },
+  {
+    "key": "q_sound-m-monyet_instruction",
+    "text": "M untuk Monyet! Ayo sentuh huruf M, [Nama]! Yang mana ya?"
+  },
+  {
+    "key": "q_sound-m-monyet_success",
+    "text": "Yey, hebat sekali [Nama]! M untuk MONYET! Monyetnya melompat gembira!"
+  },
+  {
+    "key": "q_sound-m-monyet_hint",
+    "text": "Monyet itu mulainya dari huruf M yang seperti gunung, [Nama]! Sentuh huruf M yuk!"
+  },
+  {
+    "key": "q_sound-s-singa_instruction",
+    "text": "S untuk Singa! Ayo sentuh huruf S, [Nama]! Yang mana ya?"
+  },
+  {
+    "key": "q_sound-s-singa_success",
+    "text": "Wah, pintar sekali [Nama]! S untuk SINGA! Singanya mengaum ceria!"
+  },
+  {
+    "key": "q_sound-s-singa_hint",
+    "text": "Singa itu mulainya dari huruf S yang meliuk-liuk seperti cacing, [Nama]! Sentuh huruf S yuk!"
+  },
+  {
+    "key": "q_sound-g-gajah_instruction",
+    "text": "G untuk Gajah! Gajah berbelalai panjang! Ayo sentuh huruf G, [Nama]!"
+  },
+  {
+    "key": "q_sound-g-gajah_success",
+    "text": "Yey, luar biasa [Nama]! G untuk GAJAH! Gajahnya senang sekali!"
+  },
+  {
+    "key": "q_sound-g-gajah_hint",
+    "text": "Gajah itu mulainya dari huruf G bulat dengan garis kecil, [Nama]! Sentuh huruf G yuk!"
+  },
+  {
+    "key": "q_sound-p-panda_instruction",
+    "text": "P untuk Panda! Panda gendut yang lucu! Ayo sentuh huruf P, [Nama]!"
+  },
+  {
+    "key": "q_sound-p-panda_success",
+    "text": "Hebat sekali [Nama]! P untuk PANDA! Pandanya makan bambu gembira!"
+  },
+  {
+    "key": "q_sound-p-panda_hint",
+    "text": "Panda itu mulainya dari huruf P dengan kepala bulat di atas, [Nama]! Sentuh huruf P yuk!"
+  },
+  {
+    "key": "q_sound-b-buaya_instruction",
+    "text": "B untuk Buaya! Buaya besar yang baik! Ayo sentuh huruf B, [Nama]!"
+  },
+  {
+    "key": "q_sound-b-buaya_success",
+    "text": "Horeee! [Nama] hebat banget! B untuk BUAYA! Buayanya tersenyum lebar!"
+  },
+  {
+    "key": "q_sound-b-buaya_hint",
+    "text": "Buaya itu mulainya dari huruf B dengan dua perut gendut, [Nama]! Sentuh huruf B yuk!"
+  },
+  {
+    "key": "story_reading-zoo-2_slide_0",
+    "text": "Wah, hewan-hewan lucu menjatuhkan kartu suku kata di jalan! Ayo kita kumpulkan potongan nama mereka, [Nama]!"
+  },
+  {
+    "key": "story_reading-zoo-2_slide_1",
+    "text": "Lihat! Singa yang gagah bersuara SI. Bantu Nusa mencari suku kata pertamanya yuk, [Nama]!"
+  },
+  {
+    "key": "story_reading-zoo-2_slide_2",
+    "text": "Dengarkan baik-baik suara Nusa ya! Kita pilih kartu suku kata yang paling cocok. Pasti seru!"
+  },
+  {
+    "key": "q_syllable-si-singa_instruction",
+    "text": "Si, nga... SINGA! Ayo [Nama], pilih suku kata awal SI yuk!"
+  },
+  {
+    "key": "q_syllable-si-singa_success",
+    "text": "Yey! Betul sekali, [Nama]! SI untuk SINGA! Kamu hebat!"
+  },
+  {
+    "key": "q_syllable-si-singa_hint",
+    "text": "Singa... SI-nga. Suku kata SI yang depannya huruf S. Pilih SI yuk, [Nama]!"
+  },
+  {
+    "key": "q_syllable-ga-gajah_instruction",
+    "text": "Ga, jah... GAJAH! Ayo [Nama], pilih suku kata awal GA yuk!"
+  },
+  {
+    "key": "q_syllable-ga-gajah_success",
+    "text": "Wah, pintar banget! GA untuk GAJAH! Gajahnya senang sekali!"
+  },
+  {
+    "key": "q_syllable-ga-gajah_hint",
+    "text": "Gajah... GA-jah. Suku kata GA yang depannya huruf G. Pilih GA yuk, [Nama]!"
+  },
+  {
+    "key": "q_syllable-mo-monyet_instruction",
+    "text": "Mo, nyet... MONYET! Ayo [Nama], pilih suku kata awal MO yuk!"
+  },
+  {
+    "key": "q_syllable-mo-monyet_success",
+    "text": "Hebat sekali, [Nama]! MO untuk MONYET! Monyetnya menari gembira!"
+  },
+  {
+    "key": "q_syllable-mo-monyet_hint",
+    "text": "Monyet... MO-nyet. Suku kata MO yang depannya huruf M. Pilih MO yuk, [Nama]!"
+  },
+  {
+    "key": "q_syllable-bu-buaya_instruction",
+    "text": "Bu, a, ya... BUAYA! Ayo [Nama], pilih suku kata awal BU yuk!"
+  },
+  {
+    "key": "q_syllable-bu-buaya_success",
+    "text": "Tepat sekali! BU untuk BUAYA! Kamu luar biasa, [Nama]!"
+  },
+  {
+    "key": "q_syllable-bu-buaya_hint",
+    "text": "Buaya... BU-a-ya. Suku kata BU yang depannya huruf B. Pilih BU yuk, [Nama]!"
+  },
+  {
+    "key": "q_syllable-ze-zebra_instruction",
+    "text": "Ze, bra... ZEBRA! Ayo [Nama], pilih suku kata awal ZE yuk!"
+  },
+  {
+    "key": "q_syllable-ze-zebra_success",
+    "text": "Horeee! Hebat banget [Nama]! ZE untuk ZEBRA! Zebranya berlari gembira!"
+  },
+  {
+    "key": "q_syllable-ze-zebra_hint",
+    "text": "Zebra... ZE-bra. Suku kata ZE yang depannya huruf Z. Pilih ZE yuk, [Nama]!"
+  },
+  {
+    "key": "story_reading-zoo-3_slide_0",
+    "text": "Ooh tidak! Angin kencang meniup papan nama hewan sampai terpisah! Ayo kita rapikan kembali bersama Nusa, [Nama]!"
+  },
+  {
+    "key": "story_reading-zoo-3_slide_1",
+    "text": "Gampang kok! Sentuh kartunya satu per satu sesuai urutan bunyinya ya, [Nama]!"
+  },
+  {
+    "key": "story_reading-zoo-3_slide_2",
+    "text": "Setelah tersusun rapi, Nusa akan membacakan nama lengkap hewan itu. Ayo kita mulai, [Nama]!"
+  },
+  {
+    "key": "q_build-singa_instruction",
+    "text": "Ayo kita rangkai! Sentuh kartu SI lalu NGA untuk menjadi SINGA, [Nama]!"
+  },
+  {
+    "key": "q_build-singa_success",
+    "text": "Yey! SI... NGA... SINGA! Rangkaianmu hebat sekali, [Nama]!"
+  },
+  {
+    "key": "q_build-singa_hint",
+    "text": "Ayo kita mulai dari kartu SI dulu, lalu pilih NGA ya, [Nama]!"
+  },
+  {
+    "key": "q_build-gajah_instruction",
+    "text": "Ayo kita rangkai! Sentuh kartu GA lalu JAH untuk menjadi GAJAH, [Nama]!"
+  },
+  {
+    "key": "q_build-gajah_success",
+    "text": "Wah, pintar banget! GA... JAH... GAJAH! Gajahnya berterima kasih padamu!"
+  },
+  {
+    "key": "q_build-gajah_hint",
+    "text": "Kartu pertama adalah GA, lalu pilih JAH ya, [Nama]!"
+  },
+  {
+    "key": "q_build-panda_instruction",
+    "text": "Ayo kita rangkai! Sentuh kartu PAN lalu DA untuk menjadi PANDA, [Nama]!"
+  },
+  {
+    "key": "q_build-panda_success",
+    "text": "Hebat sekali! PAN... DA... PANDA! Pandanya melompat ceria, [Nama]!"
+  },
+  {
+    "key": "q_build-panda_hint",
+    "text": "Ayo cari kartu PAN dulu, baru kemudian pilih DA ya!"
+  },
+  {
+    "key": "q_build-buaya_instruction",
+    "text": "Ayo kita rangkai! Sentuh kartu BU, A, lalu YA untuk menjadi BUAYA, [Nama]!"
+  },
+  {
+    "key": "q_build-buaya_success",
+    "text": "Luar biasa! BU... A... YA... BUAYA! Kamu pahlawan kata, [Nama]!"
+  },
+  {
+    "key": "q_build-buaya_hint",
+    "text": "Mulai dari kartu BU dulu, terus pilih A, lalu pilih YA ya!"
+  },
+  {
+    "key": "q_build-monyet_instruction",
+    "text": "Ayo kita rangkai! Sentuh kartu MO lalu NYET untuk menjadi MONYET, [Nama]!"
+  },
+  {
+    "key": "q_build-monyet_success",
+    "text": "Horeee! MO... NYET... MONYET! Sukses besar! Kamu hebat banget, [Nama]!"
+  },
+  {
+    "key": "q_build-monyet_hint",
+    "text": "Monyet dimulai dari kartu MO, lalu pilih NYET ya!"
+  },
+  {
+    "key": "story_reading-zoo-4_slide_0",
+    "text": "Wah, [Nama] sudah pandai merangkai kata! Sekarang ayo kita keliling melihat hewan-hewan lucu yuk!"
+  },
+  {
+    "key": "story_reading-zoo-4_slide_1",
+    "text": "Coba baca pilihan kata di layar, lalu temukan nama yang cocok dengan gambar hewannya ya, [Nama]!"
+  },
+  {
+    "key": "story_reading-zoo-4_slide_2",
+    "text": "Jangan khawatir, kalau bingung tinggal tekan tombol suara agar Nusa membacakan petunjuknya!"
+  },
+  {
+    "key": "q_meaning-singa_instruction",
+    "text": "Hewan apakah ini, [Nama]? Coba baca lalu sentuh kata SINGA!"
+  },
+  {
+    "key": "q_meaning-singa_success",
+    "text": "Benar sekali! Ini SINGA yang gagah! Hebat!"
+  },
+  {
+    "key": "q_meaning-singa_hint",
+    "text": "Cari kata yang berbunyi SI, NGA... SINGA!"
+  },
+  {
+    "key": "q_meaning-gajah_instruction",
+    "text": "Hewan apakah ini, [Nama]? Coba baca lalu sentuh kata GAJAH!"
+  },
+  {
+    "key": "q_meaning-gajah_success",
+    "text": "Wah, pintar banget! Ini GAJAH yang berbelalai panjang!"
+  },
+  {
+    "key": "q_meaning-gajah_hint",
+    "text": "Cari kata yang berbunyi GA, JAH... GAJAH!"
+  },
+  {
+    "key": "q_meaning-panda_instruction",
+    "text": "Hewan apakah ini, [Nama]? Coba baca lalu sentuh kata PANDA!"
+  },
+  {
+    "key": "q_meaning-panda_success",
+    "text": "Betul sekali! Ini PANDA yang imut dan bulat!"
+  },
+  {
+    "key": "q_meaning-panda_hint",
+    "text": "Cari kata yang berbunyi PAN, DA... PANDA!"
+  },
+  {
+    "key": "q_meaning-buaya_instruction",
+    "text": "Hewan apakah ini, [Nama]? Coba baca lalu sentuh kata BUAYA!"
+  },
+  {
+    "key": "q_meaning-buaya_success",
+    "text": "Horeee! Benar, ini BUAYA yang bersahabat! Kamu pintar!"
+  },
+  {
+    "key": "q_meaning-buaya_hint",
+    "text": "Cari kata yang berbunyi BU, A, YA... BUAYA!"
+  },
+  {
+    "key": "q_meaning-monyet_instruction",
+    "text": "Hewan apakah ini, [Nama]? Coba baca lalu sentuh kata MONYET!"
+  },
+  {
+    "key": "q_meaning-monyet_success",
+    "text": "Luar biasa tepat! Ini MONYET yang lincah dan lucu!"
+  },
+  {
+    "key": "q_meaning-monyet_hint",
+    "text": "Cari kata yang berbunyi MO, NYET... MONYET!"
+  },
+  {
+    "key": "story_reading-zoo-5_slide_0",
+    "text": "Yey! Semua hewan sudah punya papan nama yang cantik berkat bantuan [Nama]! Terima kasih ya!"
+  },
+  {
+    "key": "story_reading-zoo-5_slide_1",
+    "text": "Sekarang, hewan-hewan ingin mendengar suaramu yang merdu saat membaca nama mereka, [Nama]!"
+  },
+  {
+    "key": "story_reading-zoo-5_slide_2",
+    "text": "Tekan tombol mikrofon yang bulat, ucapkan namanya dengan jelas, lalu Nusa akan mendengarkan!"
+  },
+  {
+    "key": "q_aloud-singa_instruction",
+    "text": "Dengarkan Nusa ya: SI, NGA, SINGA. Ayo tekan mikrofon dan baca kata SINGA, [Nama]!"
+  },
+  {
+    "key": "q_aloud-singa_success",
+    "text": "Wah, suara [Nama] merdu sekali! Nusa dengar kata SINGA. Hebat!"
+  },
+  {
+    "key": "q_aloud-singa_hint",
+    "text": "Ucapkan perlahan-lahan ya: SI... NGA... SINGA!"
+  },
+  {
+    "key": "q_aloud-gajah_instruction",
+    "text": "Dengarkan Nusa: GA, JAH, GAJAH. Ayo tekan mikrofon dan baca kata GAJAH, [Nama]!"
+  },
+  {
+    "key": "q_aloud-gajah_success",
+    "text": "Bagus sekali! Terdengar jelas kata GAJAH. Gajahnya gembira sekali!"
+  },
+  {
+    "key": "q_aloud-gajah_hint",
+    "text": "Ucapkan pelan-pelan ya: GA... JAH... GAJAH!"
+  },
+  {
+    "key": "q_aloud-panda_instruction",
+    "text": "Dengarkan Nusa: PAN, DA, PANDA. Ayo tekan mikrofon dan baca kata PANDA, [Nama]!"
+  },
+  {
+    "key": "q_aloud-panda_success",
+    "text": "Yey! Suara [Nama] pintar sekali mengucapkan PANDA. Pandanya menari!"
+  },
+  {
+    "key": "q_aloud-panda_hint",
+    "text": "Coba ucapkan dua bagian ya: PAN... lalu DA!"
+  },
+  {
+    "key": "q_aloud-buaya_instruction",
+    "text": "Dengarkan Nusa: BU, A, YA, BUAYA. Ayo tekan mikrofon dan baca kata BUAYA, [Nama]!"
+  },
+  {
+    "key": "q_aloud-buaya_success",
+    "text": "Wow, luar biasa jelas! Nusa dengar kata BUAYA. Pintar banget!"
+  },
+  {
+    "key": "q_aloud-buaya_hint",
+    "text": "Yuk dipisah bunyinya pelan-pelan: BU... A... YA... BUAYA!"
+  },
+  {
+    "key": "q_aloud-zebra_instruction",
+    "text": "Dengarkan Nusa: ZE, BRA, ZEBRA. Ayo tekan mikrofon dan baca kata ZEBRA, [Nama]!"
+  },
+  {
+    "key": "q_aloud-zebra_success",
+    "text": "Horeee! Jelas sekali kata ZEBRA! Level selesai, [Nama] hebat luar biasa!"
+  },
+  {
+    "key": "q_aloud-zebra_hint",
+    "text": "Ikuti suara Nusa ya: ZE... BRA... ZEBRA!"
+  },
+  {
+    "key": "story_writing-zoo-1_slide_0",
+    "text": "Hai [Nama]! Ayo kita menggambar huruf-huruf cantik bersama Nusa yuk!"
+  },
+  {
+    "key": "story_writing-zoo-1_slide_1",
+    "text": "Gerakkan jarimu pelan-pelan mengikuti garis dan bintang ya, [Nama]! Seru sekali!"
+  },
+  {
+    "key": "story_writing-zoo-1_slide_2",
+    "text": "Tulis sampai selesai untuk mendapatkan bintang emas! Kamu pasti bisa, [Nama]!"
+  },
+  {
+    "key": "q_write-a_instruction",
+    "text": "Wah! Lihat huruf A yang besar! Ayo ikuti garis huruf A yuk, [Nama]! Hebat!"
+  },
+  {
+    "key": "q_write-a_success",
+    "text": "Wah hebat sekali [Nama]! Kamu berhasil menulis huruf A! Pintar banget!"
+  },
+  {
+    "key": "q_write-a_hint",
+    "text": "Mulai dari bintang pertama di atas ya, lalu tarik garis ke bawah pelan-pelan, [Nama]!"
+  },
+  {
+    "key": "q_write-b_instruction",
+    "text": "Sekarang, mari telusuri huruf B yang gendut ini! Ayo kita tebalkan, [Nama]!"
+  },
+  {
+    "key": "q_write-b_success",
+    "text": "Keren banget [Nama]! Huruf B kamu rapi sekali! Nusa bangga!"
+  },
+  {
+    "key": "q_write-b_hint",
+    "text": "Tarik tiang lurus ke bawah, lalu buat dua perut gendut pelan-pelan ya, [Nama]!"
+  },
+  {
+    "key": "q_write-c_instruction",
+    "text": "Wah, lihat huruf C melengkung seperti bulan sabit! Ayo tebalkan, [Nama]!"
+  },
+  {
+    "key": "q_write-c_success",
+    "text": "Hebat sekali! Huruf C kamu sempurna! [Nama] memang pintar!"
+  },
+  {
+    "key": "q_write-c_hint",
+    "text": "Mulai dari atas dan buat garis melengkung yang cantik ya, [Nama]!"
+  },
+  {
+    "key": "q_write-d_instruction",
+    "text": "Ayo tulis huruf D yang punya perut besar di depan! Ikuti petunjuknya ya, [Nama]!"
+  },
+  {
+    "key": "q_write-d_success",
+    "text": "Yey! Luar biasa pintar [Nama]! Itu huruf D yang sangat indah!"
+  },
+  {
+    "key": "q_write-d_hint",
+    "text": "Buat tiang tegak dulu, lalu tarik perut melengkungnya ke depan ya, [Nama]!"
+  },
+  {
+    "key": "q_write-e_instruction",
+    "text": "Huruf terakhir di level ini adalah huruf E! Ayo kita lukis bersama, [Nama]!"
+  },
+  {
+    "key": "q_write-e_success",
+    "text": "Wah, luar biasa! Semua huruf sudah kamu tulis! [Nama] hebat banget! Tos dulu!"
+  },
+  {
+    "key": "q_write-e_hint",
+    "text": "Tebalkan tiangnya dulu, lalu buat tiga garis tidur di sampingnya ya, [Nama]!"
+  },
+  {
+    "key": "story_writing-zoo-2_slide_0",
+    "text": "Hai [Nama], siap menulis huruf baru? Jerapah leher panjang ingin menemanimu!"
+  },
+  {
+    "key": "story_writing-zoo-2_slide_1",
+    "text": "Sentuh layarnya dengan jari ajaibmu and ikuti titik-titiknya pelan-pelan ya, [Nama]!"
+  },
+  {
+    "key": "story_writing-zoo-2_slide_2",
+    "text": "Setiap goresan jarimu membuat huruf-huruf ini jadi hidup dan ceria! Ayo mulai, [Nama]!"
+  },
+  {
+    "key": "q_write-f_instruction",
+    "text": "Ayo mulai dengan huruf F yang gagah! Ikuti garisnya yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-f_success",
+    "text": "Wah hebat sekali [Nama]! Huruf F kamu selesai dengan indah!"
+  },
+  {
+    "key": "q_write-f_hint",
+    "text": "Buat tiang tegak ke bawah, lalu pasang dua garis di atas and di tengah ya!"
+  },
+  {
+    "key": "q_write-g_instruction",
+    "text": "Sekarang, mari telusuri huruf G yang bulat besar! Ayo ikuti Nusa, [Nama]!"
+  },
+  {
+    "key": "q_write-g_success",
+    "text": "Wah pintar sekali [Nama]! Kamu berhasil menulis huruf G! Keren!"
+  },
+  {
+    "key": "q_write-g_hint",
+    "text": "Buat lengkungan besar seperti bulan sabit dulu, lalu tarik garis kecil di tengah ya!"
+  },
+  {
+    "key": "q_write-h_instruction",
+    "text": "Ini huruf H yang mirip kursi! Ayo kita tebalkan bersama, [Nama]!"
+  },
+  {
+    "key": "q_write-h_success",
+    "text": "Yey! Luar biasa bagus huruf H kamu, [Nama]! Nusa senang sekali!"
+  },
+  {
+    "key": "q_write-h_hint",
+    "text": "Gambar dua tiang lurus berdiri, lalu hubungkan dengan garis tidur di tengah ya!"
+  },
+  {
+    "key": "q_write-i_instruction",
+    "text": "Huruf I yang sangat mudah, tegak lurus seperti tiang! Tebalkan yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-i_success",
+    "text": "Pintar banget [Nama]! Huruf I tegak lurus sempurna! Mudah sekali kan?"
+  },
+  {
+    "key": "q_write-i_hint",
+    "text": "Cukup tarik satu garis lurus dari atas ke bawah ya, [Nama]!"
+  },
+  {
+    "key": "q_write-j_instruction",
+    "text": "Huruf terakhir di level ini adalah huruf J yang mirip payung! Tulis yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-j_success",
+    "text": "Horeee! Kamu Hebat! Semua huruf di level ini berhasil kamu tulis dengan rapi!"
+  },
+  {
+    "key": "q_write-j_hint",
+    "text": "Tarik garis lurus ke bawah lalu belokkan ke kiri seperti gagang payung ya, [Nama]!"
+  },
+  {
+    "key": "story_writing-zoo-3_slide_0",
+    "text": "Monyet lucu melompat gembira melihat tulisan rapi dari [Nama]! Ayo kita lanjut menulis yuk!"
+  },
+  {
+    "key": "story_writing-zoo-3_slide_1",
+    "text": "Huruf baru K sampai O sudah menunggu jarimu yang lincah, [Nama]! Ikuti petunjuknya ya!"
+  },
+  {
+    "key": "story_writing-zoo-3_slide_2",
+    "text": "Sedikit demi sedikit hurufnya akan selesai and terlihat sangat cantik! Semangat, [Nama]!"
+  },
+  {
+    "key": "q_write-k_instruction",
+    "text": "Ayo tulis huruf K yang punya dua tangan melambai! Ikuti garisnya, [Nama]!"
+  },
+  {
+    "key": "q_write-k_success",
+    "text": "Yey hebat! Huruf K terbentuk sangat rapi! [Nama] pintar sekali!"
+  },
+  {
+    "key": "q_write-k_hint",
+    "text": "Tarik tiang lurus dulu, lalu gambar dua kaki miring di sampingnya ya, [Nama]!"
+  },
+  {
+    "key": "q_write-l_instruction",
+    "text": "Sekarang huruf L yang tinggi and berkaki tidur! Tebalkan yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-l_success",
+    "text": "Wah hebat sekali [Nama]! Huruf L berkaki tidur selesai dengan indah!"
+  },
+  {
+    "key": "q_write-l_hint",
+    "text": "Tarik garis tegak ke bawah, lalu belokkan ke samping kanan ya, [Nama]!"
+  },
+  {
+    "key": "q_write-monyet-3_instruction",
+    "text": "Ayo tulis huruf M yang bergelombang seperti dua gunung! Gambar yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-monyet-3_success",
+    "text": "Wah, luar biasa pintar [Nama]! Huruf M kamu kokoh sekali! Hebat!"
+  },
+  {
+    "key": "q_write-monyet-3_hint",
+    "text": "Tarik garis naik, miring turun, miring naik, lalu turun lurus lagi ya!"
+  },
+  {
+    "key": "q_write-n_instruction",
+    "text": "Ini huruf N yang punya jembatan miring! Ayo kita lukis bersama, [Nama]!"
+  },
+  {
+    "key": "q_write-n_success",
+    "text": "Keren banget [Nama]! Huruf N selesai dengan sempurna! Pintar sekali!"
+  },
+  {
+    "key": "q_write-n_hint",
+    "text": "Mulai dari tiang kiri, miring turun ke kanan, lalu tarik tiang kanan ke atas ya!"
+  },
+  {
+    "key": "q_write-o_instruction",
+    "text": "Ayo buat huruf O bulat seperti donat manis! Putar jarimu melingkar, [Nama]!"
+  },
+  {
+    "key": "q_write-o_success",
+    "text": "Luar biasa bulat and indah! Huruf O donat kamu selesai! Kamu hebat, [Nama]!"
+  },
+  {
+    "key": "q_write-o_hint",
+    "text": "Putar melingkar pelan-pelan dari atas sampai bertemu kembali di atas ya!"
+  },
+  {
+    "key": "story_writing-zoo-4_slide_0",
+    "text": "Panda bulat sangat gembira melihat tulisan rapi dari [Nama]! Ayo kita lanjut menulis!"
+  },
+  {
+    "key": "story_writing-zoo-4_slide_1",
+    "text": "Ayo [Nama], siapkan jarimu untuk melukis huruf P sampai T yang sangat keren!"
+  },
+  {
+    "key": "story_writing-zoo-4_slide_2",
+    "text": "Setiap huruf baru akan membuatmu makin pintar! Nusa bangga padamu, [Nama]!"
+  },
+  {
+    "key": "q_write-panda-4_instruction",
+    "text": "Ayo tulis huruf P yang punya topi gelembung di atas! Tebalkan yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-panda-4_success",
+    "text": "Yey! Huruf P topi gelembung kamu cantik sekali! Pintar banget [Nama]!"
+  },
+  {
+    "key": "q_write-panda-4_hint",
+    "text": "Tarik garis lurus ke bawah, lalu buat lengkungan kepala bulat di atas ya!"
+  },
+  {
+    "key": "q_write-q_instruction",
+    "text": "Sekarang huruf Q bulat yang punya kaki kecil di bawah! Lukis yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-q_success",
+    "text": "Wah hebat sekali [Nama]! Huruf Q kamu selesai dengan sempurna!"
+  },
+  {
+    "key": "q_write-q_hint",
+    "text": "Buat lingkaran seperti huruf O dulu, lalu beri ekor kecil miring di kanan bawah ya!"
+  },
+  {
+    "key": "q_write-r_instruction",
+    "text": "Ayo telusuri huruf R yang gagah berdiri! Ada tiang, kepala gelembung, and kakinya!"
+  },
+  {
+    "key": "q_write-r_success",
+    "text": "Bagus sekali! Huruf R kamu gagah and indah! [Nama] memang pintar!"
+  },
+  {
+    "key": "q_write-r_hint",
+    "text": "Tarik tiang tegak dulu, buat lengkung kepala atas, lalu buat kaki miring ke bawah ya!"
+  },
+  {
+    "key": "q_write-singa-4_instruction",
+    "text": "Ini huruf S meliuk-liuk cantik seperti ular meluncur! Ayo ikuti jalannya, [Nama]!"
+  },
+  {
+    "key": "q_write-singa-4_success",
+    "text": "Keren banget! Huruf S meliuk rapi sekali! Nusa suka sekali tulisanmu, [Nama]!"
+  },
+  {
+    "key": "q_write-singa-4_hint",
+    "text": "Lengkung ke kiri di atas, lalu liukkan ke kanan di bawah pelan-pelan ya!"
+  },
+  {
+    "key": "q_write-t_instruction",
+    "text": "Huruf T punya tiang lurus and topi lebar di atas! Ayo kita tebalkan, [Nama]!"
+  },
+  {
+    "key": "q_write-t_success",
+    "text": "Horeee! Luar biasa! Semua huruf di level ini sudah selesai kamu tulis! Hebat!"
+  },
+  {
+    "key": "q_write-t_hint",
+    "text": "Buat garis datar topinya dulu di atas, lalu tarik tiang lurus ke bawah ya, [Nama]!"
+  },
+  {
+    "key": "story_writing-zoo-5_slide_0",
+    "text": "Zebra bergaris sangat menantikan tulisan terakhir dari [Nama]! Ayo kita lengkapkan!"
+  },
+  {
+    "key": "story_writing-zoo-5_slide_1",
+    "text": "Tinggal sedikit lagi alfabet kita lengkap, [Nama]! Lukis dengan jarimu yang ajaib!"
+  },
+  {
+    "key": "story_writing-zoo-5_slide_2",
+    "text": "Setelah huruf Z selesai, kamu adalah juara menulis kebun binatang! Ayo mulai, [Nama]!"
+  },
+  {
+    "key": "q_write-u_instruction",
+    "text": "Ayo tulis huruf U seperti mangkuk sup hangat! Ikuti jalurnya yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-u_success",
+    "text": "Yey hebat! Huruf U mangkuk sup kamu selesai dengan indah! [Nama] pintar!"
+  },
+  {
+    "key": "q_write-u_hint",
+    "text": "Ikuti bentuk mangkuknya dari kiri ke kanan ya!"
+  },
+  {
+    "key": "q_write-v_instruction",
+    "text": "Sekarang huruf V yang tajam di bawah! Lukis pelan-pelan yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-v_success",
+    "text": "Wah hebat sekali [Nama]! Huruf V kamu tajam and sangat bagus!"
+  },
+  {
+    "key": "q_write-v_hint",
+    "text": "Tarik garis miring turun ke bawah, lalu naik miring ke kanan atas ya!"
+  },
+  {
+    "key": "q_write-w_instruction",
+    "text": "Ayo tulis huruf W seperti dua mangkuk yang menempel! Gambar yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-w_success",
+    "text": "Bagus banget! Huruf W selesai dengan sempurna! [Nama] memang hebat!"
+  },
+  {
+    "key": "q_write-w_hint",
+    "text": "Tarik turun naik, lalu tarik turun naik miring lagi pelan-pelan ya!"
+  },
+  {
+    "key": "q_write-x_instruction",
+    "text": "Ini huruf X silang bersilang seperti pedang mainan! Ayo lukis, [Nama]!"
+  },
+  {
+    "key": "q_write-x_success",
+    "text": "Keren sekali! Huruf X silang kamu rapi sekali! Pintar banget!"
+  },
+  {
+    "key": "q_write-x_hint",
+    "text": "Tarik garis miring pertama, lalu silang dengan garis miring kedua ya!"
+  },
+  {
+    "key": "q_write-y_instruction",
+    "text": "Ayo tulis huruf Y yang punya tangan terbuka di atas! Lukis yuk, [Nama]!"
+  },
+  {
+    "key": "q_write-y_success",
+    "text": "Hebat sekali! Huruf Y selesai dengan indah! [Nama] luar biasa!"
+  },
+  {
+    "key": "q_write-y_hint",
+    "text": "Buat dua garis miring atas bertemu di tengah, lalu tarik tiang lurus ke bawah ya!"
+  },
+  {
+    "key": "q_write-zebra-5_instruction",
+    "text": "Huruf terakhir Z seperti kilatan petir! Ayo kita selesaikan petualangan menulis ini, [Nama]!"
+  },
+  {
+    "key": "q_write-zebra-5_success",
+    "text": "Luar biasa! Yey, semua huruf dari A sampai Z selesai! [Nama] juara menulis kebanggaan Nusa! 💖"
+  },
+  {
+    "key": "q_write-zebra-5_hint",
+    "text": "Tarik garis tidur atas, miring turun ke kiri, lalu tarik garis tidur bawah ya!"
+  },
+  {
+    "key": "story_counting-zoo-1_slide_0",
+    "text": "Halo! Aku Nusa! Mau bantu hewan-hewan lucu masuk ke kandang mereka yang nyaman, [Nama]?"
+  },
+  {
+    "key": "story_counting-zoo-1_slide_1",
+    "text": "Hewan-hewan lucu ini bingung mencari rumah mereka. Ayo kita bantu bersama, [Nama]!"
+  },
+  {
+    "key": "story_counting-zoo-1_slide_2",
+    "text": "Ayo hitung pelan-pelan ya. Satu, dua, tiga! Mari kita bantu mereka pulang, [Nama]!"
+  },
+  {
+    "key": "q_count-1_instruction",
+    "text": "Wah, lihat! Ada satu singa lucu di luar! Yuk kita tarik masuk ke kandang, [Nama]!"
+  },
+  {
+    "key": "q_count-1_success",
+    "text": "Yey! Singanya sekarang aman di dalam kandang! Pintar sekali [Nama]!"
+  },
+  {
+    "key": "q_count-1_hint",
+    "text": "Bantu Nusa geser satu singa lucu itu ke dalam kandang yuk, [Nama]!"
+  },
+  {
+    "key": "q_count-2_instruction",
+    "text": "Hei lihat, ada dua panda gendut yang imut! Ayo [Nama], kita ajak masuk ke kandang yuk!"
+  },
+  {
+    "key": "q_count-2_success",
+    "text": "Pintar sekali! Kedua pandanya sudah masuk dan bisa makan bambu! Hebat!"
+  },
+  {
+    "key": "q_count-2_hint",
+    "text": "Ayo kita hitung bersama: satu... dua! Tarik kedua panda itu ke dalam ya!"
+  },
+  {
+    "key": "q_count-3_instruction",
+    "text": "Wah, ada tiga zebra bergaris cantik di luar! Yuk bantu mereka masuk kandang, [Nama]!"
+  },
+  {
+    "key": "q_count-3_success",
+    "text": "Zebranya pasti senang sekali sekarang! [Nama] memang anak baik dan pintar!"
+  },
+  {
+    "key": "q_count-3_hint",
+    "text": "Bantu Nusa geser tiga zebra lucu itu ke kandangnya yuk!"
+  },
+  {
+    "key": "q_count-4_instruction",
+    "text": "Lihat, ada empat monyet lucu yang melompat-lompat! Ayo kita ajak masuk kandang, [Nama]!"
+  },
+  {
+    "key": "q_count-4_success",
+    "text": "Horeee! Monyet-monyetnya sangat gembira dan berterima kasih padamu!"
+  },
+  {
+    "key": "q_count-4_hint",
+    "text": "Hitung pelan-pelan ya: satu, dua, tiga, empat! Tarik empat monyet itu masuk."
+  },
+  {
+    "key": "q_count-5_instruction",
+    "text": "Wah, ada lima buaya bersahabat yang ingin berenang! Ayo masukkan ke kandang kolam, [Nama]!"
+  },
+  {
+    "key": "q_count-5_success",
+    "text": "Luar biasa berani dan pintar! Kelima buayanya sudah masuk kolam! Hebat!"
+  },
+  {
+    "key": "q_count-5_hint",
+    "text": "Hitung satu-satu sampai lima ya, lalu tarik kelima buaya itu."
+  },
+  {
+    "key": "story_counting-zoo-2_slide_0",
+    "text": "Wah, panda imut membawa teman-teman baru untuk bermain bersama [Nama]! Seru sekali!"
+  },
+  {
+    "key": "story_counting-zoo-2_slide_1",
+    "text": "Kandangnya sudah siap dan hangat. Yuk isi dengan hewan-hewan gembira, [Nama]!"
+  },
+  {
+    "key": "story_counting-zoo-2_slide_2",
+    "text": "Dua, tiga, empat! Hitung dengan teliti bersama Nusa ya, [Nama]!"
+  },
+  {
+    "key": "q_count-2-panda-l2_instruction",
+    "text": "Lihat teman baru! Ada dua panda gendut yang ingin masuk kandang, [Nama]!"
+  },
+  {
+    "key": "q_count-2-panda-l2_success",
+    "text": "Wah hebat sekali [Nama]! Pandanya melompat-lompat gembira di dalam kandang!"
+  },
+  {
+    "key": "q_count-2-panda-l2_hint",
+    "text": "Hitung bersama Nusa: satu... dua! Lalu geser kedua panda itu ke dalam ya!"
+  },
+  {
+    "key": "q_count-3-gajah-l2_instruction",
+    "text": "Wah, ada tiga gajah berbelalai panjang yang lelah! Bantu mereka masuk kandang yuk, [Nama]!"
+  },
+  {
+    "key": "q_count-3-gajah-l2_success",
+    "text": "Keren banget [Nama]! Ketiga gajah besar sudah masuk dan bisa beristirahat!"
+  },
+  {
+    "key": "q_count-3-gajah-l2_hint",
+    "text": "Tarik ketiga gajah besar itu satu per satu ke dalam kandang ya!"
+  },
+  {
+    "key": "q_count-4-zebra-l2_instruction",
+    "text": "Empat zebra lucu ini ingin tidur siang. Ayo kita bawa mereka masuk kandang, [Nama]!"
+  },
+  {
+    "key": "q_count-4-zebra-l2_success",
+    "text": "Pintar sekali [Nama]! Zebranya sekarang bisa tidur nyenyak di kandang hangat!"
+  },
+  {
+    "key": "q_count-4-zebra-l2_hint",
+    "text": "Geser keempat zebra cantik itu ke dalam satu-satu ya, kamu pasti bisa!"
+  },
+  {
+    "key": "story_counting-zoo-3_slide_0",
+    "text": "Wah, ramai sekali! Banyak hewan lucu yang baru datang ke kebun binatang, [Nama]!"
+  },
+  {
+    "key": "story_counting-zoo-3_slide_1",
+    "text": "Hewan-hewan ini sangat membutuhkan bantuan anak pintar seperti [Nama] untuk pulang!"
+  },
+  {
+    "key": "story_counting-zoo-3_slide_2",
+    "text": "Tiga, empat, lima! Ayo hitung dengan ceria dan gembira bersama Nusa!"
+  },
+  {
+    "key": "q_count-3-monyet-l3_instruction",
+    "text": "Kandangnya ramai! Ada tiga monyet lincah yang ingin makan pisang di dalam, [Nama]!"
+  },
+  {
+    "key": "q_count-3-monyet-l3_success",
+    "text": "Asyik! Monyet-monyetnya sangat senang bisa makan pisang bersama! Kamu hebat!"
+  },
+  {
+    "key": "q_count-3-monyet-l3_hint",
+    "text": "Yuk geser tiga monyet lucu ini ke rumahnya satu-satu ya, [Nama]!"
+  },
+  {
+    "key": "q_count-4-singa-l3_instruction",
+    "text": "Lihat, empat singa gagah bersaudara ini mau berkumpul di rumahnya, [Nama]!"
+  },
+  {
+    "key": "q_count-4-singa-l3_success",
+    "text": "Luar biasa pintar [Nama]! Keempat singa gagah sudah aman di dalam rumah!"
+  },
+  {
+    "key": "q_count-4-singa-l3_hint",
+    "text": "Hitung empat singa gagah itu dan geser perlahan ke kandang ya!"
+  },
+  {
+    "key": "q_count-5-harimau-l3_instruction",
+    "text": "Wah, ada lima anak harimau belang yang lucu sedang bermain! Ayo ajak mereka masuk, [Nama]!"
+  },
+  {
+    "key": "q_count-5-harimau-l3_success",
+    "text": "Kamu memang pahlawan hewan sejati! Kelima harimau menyayangimu, [Nama]! 💖"
+  },
+  {
+    "key": "q_count-5-harimau-l3_hint",
+    "text": "Hitung kelima anak harimau belang dengan teliti lalu tarik ke kandang ya!"
+  },
+  {
+    "key": "story_counting-zoo-4_slide_0",
+    "text": "Wah! Kandang di level ini besar dan luas sekali, [Nama]! Muat banyak hewan!"
+  },
+  {
+    "key": "story_counting-zoo-4_slide_1",
+    "text": "Lihat! Hewan-hewan berbaris rapi menunggu bantuan dari [Nama]! Lucu sekali!"
+  },
+  {
+    "key": "story_counting-zoo-4_slide_2",
+    "text": "Ayo jadi pahlawan cilik penolong hewan! Hitung dengan teliti dan penuh semangat ya!"
+  },
+  {
+    "key": "q_count-4-buaya-l4_instruction",
+    "text": "Kandang kolamnya sangat luas! Ayo bawa empat buaya baik ini masuk, [Nama]!"
+  },
+  {
+    "key": "q_count-4-buaya-l4_success",
+    "text": "Hebat sekali! Keempat buaya berbaris rapi di dalam kolam! [Nama] pintar!"
+  },
+  {
+    "key": "q_count-4-buaya-l4_hint",
+    "text": "Tarik keempat buaya bersahabat ini pelan-pelan ke dalam kolam ya!"
+  },
+  {
+    "key": "q_count-5-beruang-l4_instruction",
+    "text": "Lima beruang besar berbulu tebal ini sudah mengantuk, yuk antar mereka, [Nama]!"
+  },
+  {
+    "key": "q_count-5-beruang-l4_success",
+    "text": "Wah pintar sekali! Beruang-beruangnya sudah bisa tidur nyenyak di goa kandang!"
+  },
+  {
+    "key": "q_count-5-beruang-l4_hint",
+    "text": "Hitung satu sampai lima, lalu geser kelima beruang besar itu pelan-pelan ya!"
+  },
+  {
+    "key": "q_count-6-kudanil-l4_instruction",
+    "text": "Enam kudanil gemuk ini mau masuk ke dalam kolam lumpur hangatnya! Bantu yuk, [Nama]!"
+  },
+  {
+    "key": "q_count-6-kudanil-l4_success",
+    "text": "Sempurna! Kudanil gemuknya berendam gembira! Kamu memang hebat, [Nama]!"
+  },
+  {
+    "key": "q_count-6-kudanil-l4_hint",
+    "text": "Ayo kita hitung satu-satu sampai enam kudanil gemuk, lalu geser mereka ya!"
+  },
+  {
+    "key": "story_counting-zoo-5_slide_0",
+    "text": "Yey! Hari ini ada pesta kandang meriah di kebun binatang! Semua hewan ingin ikut, [Nama]!"
+  },
+  {
+    "key": "story_counting-zoo-5_slide_1",
+    "text": "Ini misi menghitung terakhir dari Nusa! Ayo kita selesaikan dengan gembira, [Nama]!"
+  },
+  {
+    "key": "story_counting-zoo-5_slide_2",
+    "text": "Ayo hitung lima, enam, sampai tujuh hewan gembira! Kita rayakan bersama, [Nama]!"
+  },
+  {
+    "key": "q_count-5-jerapah-l5_instruction",
+    "text": "Waktunya pesta kandang! Ajak lima jerapah leher panjang ini masuk yuk, [Nama]!"
+  },
+  {
+    "key": "q_count-5-jerapah-l5_success",
+    "text": "Kamu memang luar biasa hebat! Jerapah leher panjang menari-nari gembira!"
+  },
+  {
+    "key": "q_count-5-jerapah-l5_hint",
+    "text": "Hitung lima jerapah leher panjang dan geser mereka perlahan ya!"
+  },
+  {
+    "key": "q_count-6-panda-l5_instruction",
+    "text": "Enam panda bulat yang lucu mau ikut pesta makan bambu! Ayo bawa mereka masuk, [Nama]!"
+  },
+  {
+    "key": "q_count-6-panda-l5_success",
+    "text": "Wow keren banget! Kandangnya jadi ramai dan sangat seru! Pandanya senang!"
+  },
+  {
+    "key": "q_count-6-panda-l5_hint",
+    "text": "Satu persatu dengan gembira, bawa keenam panda bulat ini masuk ya!"
+  },
+  {
+    "key": "q_count-7-monyet-l5_instruction",
+    "text": "Misi terakhir! Bawa tujuh monyet lincah yang suka menari ini masuk kandang, [Nama]!"
+  },
+  {
+    "key": "q_count-7-monyet-l5_success",
+    "text": "Horeee! Kamu berhasil membawa semua hewan pulang ke pesta! [Nama] anak paling hebat dan pintar di dunia! Nusa bangga banget! 💖🌟"
+  },
+  {
+    "key": "q_count-7-monyet-l5_hint",
+    "text": "Hitung ketujuh monyet lincah itu, kamu pasti bisa menyelesaikan misi terakhir ini!"
+  },
+  {
+    "key": "story_puzzle-zoo-1_slide_0",
+    "text": "Hai [Nama]! Ayo kita susun kepingan gambar singa yang lucu ini yuk! Sentuh dua kotak untuk menukarnya ya! Pasti seru!"
+  },
+  {
+    "key": "story_puzzle-zoo-2_slide_0",
+    "text": "Wah, kepingan gambarnya makin banyak, [Nama]! Cari kepingan yang gambarnya menyambung ya, kamu pasti bisa! Semangat!"
+  },
+  {
+    "key": "story_puzzle-zoo-3_slide_0",
+    "text": "Ini tantangan puzzle terakhir dari Nusa, [Nama]! Susun pelan-pelan sampai gambarnya utuh sempurna! Yey, ayo kita mulai!"
+  },
+  {
+    "key": "chat_idea_makan",
+    "text": "Aku suka makan mangga dan pisang! Kalau kamu, [Nama] suka makan apa?"
+  },
+  {
+    "key": "chat_idea_warna",
+    "text": "Warna kesukaanku biru langit! Kalau [Nama] suka warna apa?"
+  },
+  {
+    "key": "chat_idea_citacita",
+    "text": "Aku ingin jadi penjelajah keliling dunia! Kalau [Nama] ingin jadi apa?"
+  },
+  {
+    "key": "chat_idea_hewan",
+    "text": "Hewan kesukaanku kucing yang lucu! Kalau [Nama] suka hewan apa?"
+  },
+  {
+    "key": "chat_idea_balonku",
+    "text": "Ayo kita nyanyi balonku ada lima bersama, [Nama] ikut nyanyi ya!"
+  },
+  {
+    "key": "chat_idea_dongeng",
+    "text": "Aku punya cerita seru tentang kelinci pemberani! Mau dengar, [Nama]?"
+  },
+  {
+    "key": "chat_greeting",
+    "text": "Halo [Nama]! Aku Nusa, teman belajar kamu. Ada yang mau ditanyakan?"
+  }
+]
