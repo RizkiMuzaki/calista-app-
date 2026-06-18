@@ -66,12 +66,12 @@ return [
         'credit_plans' => [
             'free' => [
                 'code' => 'free',
-                'limit' => (int) env('CALISTA_AI_FREE_CREDITS', 0),
+                'limit' => (int) env('CALISTA_AI_FREE_CREDITS', 20000),
                 'reset' => 'monthly',
             ],
             'weekly' => [
                 'code' => 'weekly',
-                'limit' => (int) env('CALISTA_AI_WEEKLY_CREDITS', 5000),
+                'limit' => (int) env('CALISTA_AI_WEEKLY_CREDITS', 15000),
                 'reset' => 'weekly',
             ],
             'monthly' => [
@@ -81,7 +81,7 @@ return [
             ],
             'yearly' => [
                 'code' => 'yearly',
-                'limit' => (int) env('CALISTA_AI_YEARLY_CREDITS', 30021),
+                'limit' => (int) env('CALISTA_AI_YEARLY_CREDITS', 0),
                 'reset' => 'monthly',
             ],
         ],
