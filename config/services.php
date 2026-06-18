@@ -66,25 +66,22 @@ return [
         'credit_plans' => [
             'free' => [
                 'code' => 'free',
-                'limit' => (int) env('CALISTA_AI_FREE_CREDITS', 5000),
+                'limit' => (int) env('CALISTA_AI_FREE_CREDITS', 0),
                 'reset' => 'monthly',
             ],
             'weekly' => [
                 'code' => 'weekly',
-                'limit' => (int) env('CALISTA_AI_WEEKLY_CREDITS', 10000),
+                'limit' => (int) env('CALISTA_AI_WEEKLY_CREDITS', 5000),
                 'reset' => 'weekly',
             ],
             'monthly' => [
                 'code' => 'monthly',
-                // ElevenLabs Creator Plan = 131k chars/month
-                // Kita set 100k sebagai soft cap, sisanya buffer
-                'limit' => (int) env('CALISTA_AI_MONTHLY_CREDITS', 100000),
+                'limit' => (int) env('CALISTA_AI_MONTHLY_CREDITS', 15000),
                 'reset' => 'monthly',
             ],
             'yearly' => [
                 'code' => 'yearly',
-                // Yearly tidak ditawarkan di beta — redirect ke free behavior
-                'limit' => (int) env('CALISTA_AI_YEARLY_CREDITS', 0),
+                'limit' => (int) env('CALISTA_AI_YEARLY_CREDITS', 30021),
                 'reset' => 'monthly',
             ],
         ],
