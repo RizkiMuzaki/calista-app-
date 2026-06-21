@@ -192,12 +192,14 @@
     height: 50px;
     margin-bottom: 3px;
     text-align: center;
+    position: relative;
+    border-bottom: 1.5px solid #ccc;
   }
 
   .day-bar {
-    width: 18px;
-    border-radius: 6px 6px 0 0;
-    min-height: 4px;
+    border-radius: 3px 3px 0 0;
+    position: absolute;
+    bottom: 0;
   }
 
   .day-label {
@@ -468,11 +470,29 @@
 @endphp
 
 <table style="width: 100%; border-collapse: collapse; border: 0; margin-bottom: 10px;">
-  <tr>
+  <!-- Row 1: Diagram Batang dengan Baseline Sumbu-X -->
+  <tr style="height: 65px;">
   @foreach($daily as $i => $day)
     @php
       $heightPx = max(4, round(($day['play_minutes'] / $maxMin) * 50));
       $color = $day['play_minutes'] > 0 ? ($barColors[$i % 7]) : '#e0e0e0';
+      $barWidth = $isMonthly ? 6 : 16;
+    @endphp
+    <td style="width: {{ 100 / count($daily) }}%; text-align: center; border: 0; padding: 0; vertical-align: bottom; height: 65px; border-bottom: 2px solid #e0e0e0;">
+      @if(!$isMonthly && $day['play_minutes'] > 0)
+        <div style="color: {{ $color }}; font-size: 7px; font-weight: 900; margin-bottom: 2px; height: 10px; line-height: 10px;">
+          {{ number_format($day['play_minutes'], 1) }}m
+        </div>
+      @endif
+      <div style="height: {{ $heightPx }}px; background: {{ $color }}; width: {{ $barWidth }}px; margin: 0 auto; border-radius: 3px 3px 0 0;"></div>
+    </td>
+  @endforeach
+  </tr>
+
+  <!-- Row 2: Label Sumbu-X -->
+  <tr>
+  @foreach($daily as $i => $day)
+    @php
       $parsedDate = \Carbon\Carbon::parse($day['date']);
       $dayName = $parsedDate->locale('id')->isoFormat('ddd');
       $dayNum = $parsedDate->day;
@@ -488,18 +508,12 @@
           }
       }
     @endphp
-    <td style="width: {{ 100 / count($daily) }}%; text-align: center; border: 0; padding: 0; vertical-align: bottom;">
-      <div class="day-bar-wrap">
-        <div class="day-bar" style="height:{{ $heightPx }}px; background:{{ $color }}; margin: 0 auto; display: block;"></div>
-      </div>
-      <div class="day-label" style="font-size: 8px;">
+    <td style="text-align: center; border: 0; padding: 4px 0 0 0; vertical-align: top;">
+      <div class="day-label" style="font-size: 8px; height: 10px; line-height: 10px; font-weight: 700; color: #888;">
         @if($showLabel)
           {{ $labelText }}
-        @endif
-      </div>
-      <div class="day-min" style="color:{{ $color }}; font-size: 7px; height: 10px;">
-        @if(!$isMonthly && $day['play_minutes'] > 0)
-          {{ number_format($day['play_minutes'], 1) }}m
+        @else
+          &nbsp;
         @endif
       </div>
     </td>
