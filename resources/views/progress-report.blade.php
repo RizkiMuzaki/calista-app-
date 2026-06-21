@@ -345,9 +345,11 @@
       <td style="vertical-align: middle; border: 0; padding: 0;">
         <div class="child-name">🧒 {{ $child['nama'] }}</div>
         <div class="child-meta">
-          Umur {{ $child['umur'] ?? '-' }} tahun
+          Umur: {{ $child['umur'] ?? '-' }} tahun
           &nbsp;·&nbsp;
-          Bergabung sejak {{ $child['join_date'] }}
+          Orang Tua: {{ $parent_name ?? '-' }}
+          &nbsp;·&nbsp;
+          Bergabung: {{ $child['join_date'] }}
         </div>
       </td>
       <td style="text-align: right; vertical-align: middle; border: 0; padding: 0; width: 220px;">
@@ -611,6 +613,78 @@
   😶 Belum ada data mood di periode ini. Ajak si kecil cek mood setiap hari ya!
 </div>
 @endif
+</div>
+
+{{-- ══════════════════════════════════════════════════
+     SECTION 5.5 — INSIGHTS & REKOMENDASI TUMBUH KEMBANG
+══════════════════════════════════════════════════ --}}
+<div class="page-break"></div>
+
+<div class="section-title">✨ Nusa AI Insights & Minat Si Kecil</div>
+<div class="box" style="background: #FFF9F2; border: 1.5px solid #F5DCA3;">
+  <p style="font-size: 11px; color: #7B4FBE; font-weight: bold; margin-bottom: 8px;">
+    💡 Melalui obrolan interaktif dengan si kecil, Nusa mendeteksi beberapa ketertarikan berikut:
+  </p>
+  <table style="width: 100%; border-collapse: collapse; border: 0; font-size: 10.5px;">
+    <tr>
+      <td style="width: 130px; font-weight: bold; color: #444; padding: 4px 0; border: 0;">🚀 Cita-cita:</td>
+      <td style="color: #E91E8C; font-weight: bold; padding: 4px 0; border: 0;">
+        {{ $child['cita_cita'] ? ucfirst($child['cita_cita']) : 'Belum terdeteksi (ajak si kecil ngobrol dengan Nusa)' }}
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; color: #444; padding: 4px 0; border: 0;">🎨 Hobi:</td>
+      <td style="color: #7B4FBE; font-weight: bold; padding: 4px 0; border: 0;">
+        {{ $child['hobi'] ? ucfirst($child['hobi']) : 'Belum terdeteksi' }}
+      </td>
+    </tr>
+    <tr>
+      <td style="font-weight: bold; color: #444; padding: 4px 0; border: 0;">🍉 Makanan Favorit:</td>
+      <td style="color: #0ABFBC; font-weight: bold; padding: 4px 0; border: 0;">
+        {{ $child['makanan_favorit'] ? ucfirst($child['makanan_favorit']) : 'Belum terdeteksi' }}
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="section-title">🎓 Rekomendasi Akademik Tumbuh Kembang</div>
+<div class="box" style="background: #F4FBF7; border: 1.5px solid #A3F5C7; margin-bottom: 12px;">
+  <p style="font-size: 11px; font-weight: 900; color: #1e8a4a; margin-bottom: 6px; text-transform: uppercase;">
+    Rekomendasi Berdasarkan Gaya Belajar Dominan ({{ $learningStyle['dominant'] }})
+  </p>
+  
+  @if($learningStyle['dominant'] === 'Visual')
+    <p style="font-size: 10.5px; line-height: 1.5; color: #333;">
+      Si kecil cenderung belajar secara visual (menyerap informasi lewat gambar, warna, bentuk, dan demonstrasi konkret). Berdasarkan kajian ilmiah stimulasi keaksaraan awal anak usia dini:
+    </p>
+    <ul style="font-size: 10px; margin-left: 16px; margin-top: 6px; color: #555; line-height: 1.45;">
+      <li style="margin-bottom: 4px;"><strong>Rekomendasi Buku:</strong> Sediakan buku cerita dengan ilustrasi bergambar hewan atau fabel yang kaya warna (misalnya buku dongeng pop-up).</li>
+      <li style="margin-bottom: 4px;"><strong>Aktivitas Rumah:</strong> Ajak anak bermain kartu huruf bergambar (flashcards) dan mencocokkan kartu warna-warni untuk melatih memorinya.</li>
+      <li style="margin-bottom: 4px;"><strong>Teori Pendukung:</strong> Media visual membantu mempercepat retensi anak dalam mengenal huruf dan suku kata (Jurnal Keaksaraan Awal PAUD).</li>
+    </ul>
+  @elseif($learningStyle['dominant'] === 'Auditori')
+    <p style="font-size: 10.5px; line-height: 1.5; color: #333;">
+      Si kecil sangat peka terhadap stimulasi suara, nada, dan penjelasan verbal. Berdasarkan teori perkembangan bahasa anak TK:
+    </p>
+    <ul style="font-size: 10px; margin-left: 16px; margin-top: 6px; color: #555; line-height: 1.45;">
+      <li style="margin-bottom: 4px;"><strong>Aktivitas Rumah:</strong> Bacakan dongeng sebelum tidur dengan intonasi ekspresif, lalu ajak anak mendiskusikan cerita tersebut (misal: "Kenapa kancilnya lari ya?").</li>
+      <li style="margin-bottom: 4px;"><strong>Musik & Ejaan:</strong> Gunakan lagu bernada ceria untuk mengenalkan abjad, angka, atau kosa kata baru secara berulang.</li>
+      <li style="margin-bottom: 4px;"><strong>Teori Pendukung:</strong> Stimulasi pendengaran verbal memperkuat perkembangan sintaksis dan kejelasan lafal anak usia 3 tahun (Jurnal Pendidikan Anak Usia Dini).</li>
+    </ul>
+  @elseif($learningStyle['dominant'] === 'Kinestetik')
+    <p style="font-size: 10.5px; line-height: 1.5; color: #333;">
+      Si kecil belajar secara optimal melalui sentuhan, gerakan fisik, dan bereksplorasi langsung. Berdasarkan kajian akademis tentang motorik halus balita:
+    </p>
+    <ul style="font-size: 10px; margin-left: 16px; margin-top: 6px; color: #555; line-height: 1.45;">
+      <li style="margin-bottom: 4px;"><strong>Aktivitas Rumah:</strong> Ajak anak berlatih menulis/menggambar bebas di media bertekstur (seperti pasir kinetik, papan tulis kapur) atau menyusun balok lego/puzzle kayu fisik.</li>
+      <li style="margin-bottom: 4px;"><strong>Aktivitas Fisik:</strong> Libatkan gerakan tubuh saat belajar, contohnya melompat sambil menghitung langkah kaki di lantai.</li>
+      <li style="margin-bottom: 4px;"><strong>Teori Pendukung:</strong> Pembelajaran kinestetik terpadu merangsang koneksi neuro-motorik halus yang krusial bagi kesiapan menulis anak balita (Jurnal Perkembangan Fisik Motorik Anak).</li>
+    </ul>
+  @else
+    <p style="font-size: 10.5px; line-height: 1.5; color: #333;">
+      Si kecil menunjukkan profil gaya belajar yang seimbang. Teruskan ajak si kecil bermain di modul Membaca, Menulis, dan Berhitung untuk melacak gaya belajar dominannya yang valid!
+    </p>
+  @endif
 </div>
 
 
