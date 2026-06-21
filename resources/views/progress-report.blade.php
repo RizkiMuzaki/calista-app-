@@ -325,44 +325,59 @@
 <body>
 
 {{-- ══════════════════════════════════════════════════
-     HEADER — Brand + Identitas Anak
+     HEADER — Centered Logo & Brand
 ══════════════════════════════════════════════════ --}}
-<div class="header">
+<div style="text-align: center; margin-bottom: 20px; padding-top: 5px;">
+  @if(!empty($logoBase64))
+    <img src="{{ $logoBase64 }}" style="height: 55px; display: inline-block; vertical-align: middle;">
+  @endif
+  <div style="font-size: 24px; font-weight: 900; letter-spacing: 3px; color: #E91E8C; margin-top: 6px;">CALISTA</div>
+  <div style="font-size: 10px; color: #7B4FBE; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; margin-top: 2px;">Laporan Belajar Anak</div>
+</div>
+
+{{-- ══════════════════════════════════════════════════
+     METADATA CARD — Identitas & Periode Laporan
+══════════════════════════════════════════════════ --}}
+<div style="background: #FFF8FC; border: 1.5px solid #f5d9ee; border-radius: 16px; padding: 16px 20px; margin-bottom: 20px;">
   <table style="width: 100%; border-collapse: collapse; border: 0;">
     <tr>
-      <td style="width: 60%; vertical-align: middle; border: 0; padding: 0;">
-        @if(!empty($logoBase64))
-          <img src="{{ $logoBase64 }}" style="height: 32px; vertical-align: middle; margin-right: 6px; display: inline-block;">
-        @endif
-        <span style="font-size: 22px; font-weight: 900; letter-spacing: 2px; color: white; vertical-align: middle; display: inline-block; line-height: 32px;">CALISTA</span>
-        <div class="brand-sub">LAPORAN BELAJAR ANAK</div>
+      <!-- Informasi Anak & Orang Tua (Kiri) -->
+      <td style="width: 50%; vertical-align: top; border: 0; padding: 0;">
+        <table style="border: 0; font-size: 11px; line-height: 1.6;">
+          <tr>
+            <td style="font-weight: 700; color: #7B4FBE; width: 90px; padding: 2px 0;">Nama Anak</td>
+            <td style="color: #1a1a2e; padding: 2px 0;">: <strong style="color: #E91E8C; font-size: 12px;">{{ $child['nama'] }}</strong></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #7B4FBE; padding: 2px 0;">Umur</td>
+            <td style="color: #1a1a2e; padding: 2px 0;">: {{ $child['umur'] ?? '-' }} Tahun</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #7B4FBE; padding: 2px 0;">Orang Tua</td>
+            <td style="color: #1a1a2e; padding: 2px 0;">: {{ $parent_name ?? '-' }}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #7B4FBE; padding: 2px 0;">Bergabung</td>
+            <td style="color: #1a1a2e; padding: 2px 0;">: {{ $child['join_date'] }}</td>
+          </tr>
+        </table>
       </td>
-      <td style="width: 40%; text-align: right; vertical-align: middle; border: 0; padding: 0;">
-        <div class="header-date">
-          <div>Dicetak</div>
-          <div class="date-value">{{ $printDate }}</div>
-        </div>
-      </td>
-    </tr>
-  </table>
-
-  <table style="width: 100%; border-collapse: collapse; border: 0; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.25);">
-    <tr>
-      <td style="vertical-align: middle; border: 0; padding: 0;">
-        <div class="child-name">Profil Anak: {{ $child['nama'] }}</div>
-        <div class="child-meta">
-          Umur: {{ $child['umur'] ?? '-' }} tahun
-          &nbsp;·&nbsp;
-          Orang Tua: {{ $parent_name ?? '-' }}
-          &nbsp;·&nbsp;
-          Bergabung: {{ $child['join_date'] }}
-        </div>
-      </td>
-      <td style="text-align: right; vertical-align: middle; border: 0; padding: 0; width: 220px;">
-        <div class="period-badge" style="display: block; float: right;">
-          Periode: {{ $periodLabel }}<br>
-          <span style="font-weight:400; font-size:9px;">{{ $period['start_date'] }} — {{ $period['end_date'] }}</span>
-        </div>
+      <!-- Informasi Periode & Tanggal Cetak (Kanan) -->
+      <td style="width: 50%; vertical-align: top; border: 0; padding: 0;">
+        <table style="border: 0; font-size: 11px; line-height: 1.6; float: right;">
+          <tr>
+            <td style="font-weight: 700; color: #0ABFBC; width: 110px; padding: 2px 0;">Periode Laporan</td>
+            <td style="color: #1a1a2e; padding: 2px 0;">: <strong>{{ $periodLabel }}</strong></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #0ABFBC; padding: 2px 0;">Rentang Tanggal</td>
+            <td style="color: #1a1a2e; padding: 2px 0;">: {{ $period['start_date'] }} — {{ $period['end_date'] }}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 700; color: #0ABFBC; padding: 2px 0;">Tanggal Cetak</td>
+            <td style="color: #1a1a2e; padding: 2px 0;">: {{ $printDate }}</td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
