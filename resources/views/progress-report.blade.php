@@ -33,6 +33,7 @@
 
   /* ─── HEADER ─── */
   .header {
+    background-color: #E91E8C;
     background: linear-gradient(135deg, #E91E8C 0%, #7B4FBE 100%);
     border-radius: 18px;
     padding: 20px 24px 16px 24px;
@@ -327,11 +328,14 @@
 <div class="header">
   <table style="width: 100%; border-collapse: collapse; border: 0;">
     <tr>
-      <td style="width: 50%; vertical-align: top; border: 0; padding: 0;">
-        <div class="brand">✨ CALISTA</div>
+      <td style="width: 60%; vertical-align: middle; border: 0; padding: 0;">
+        @if(!empty($logoBase64))
+          <img src="{{ $logoBase64 }}" style="height: 32px; vertical-align: middle; margin-right: 6px; display: inline-block;">
+        @endif
+        <span style="font-size: 22px; font-weight: 900; letter-spacing: 2px; color: white; vertical-align: middle; display: inline-block; line-height: 32px;">CALISTA</span>
         <div class="brand-sub">LAPORAN BELAJAR ANAK</div>
       </td>
-      <td style="width: 50%; text-align: right; vertical-align: top; border: 0; padding: 0;">
+      <td style="width: 40%; text-align: right; vertical-align: middle; border: 0; padding: 0;">
         <div class="header-date">
           <div>Dicetak</div>
           <div class="date-value">{{ $printDate }}</div>
@@ -343,7 +347,7 @@
   <table style="width: 100%; border-collapse: collapse; border: 0; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.25);">
     <tr>
       <td style="vertical-align: middle; border: 0; padding: 0;">
-        <div class="child-name">🧒 {{ $child['nama'] }}</div>
+        <div class="child-name">Profil Anak: {{ $child['nama'] }}</div>
         <div class="child-meta">
           Umur: {{ $child['umur'] ?? '-' }} tahun
           &nbsp;·&nbsp;
@@ -354,7 +358,7 @@
       </td>
       <td style="text-align: right; vertical-align: middle; border: 0; padding: 0; width: 220px;">
         <div class="period-badge" style="display: block; float: right;">
-          📅 {{ $periodLabel }}<br>
+          Periode: {{ $periodLabel }}<br>
           <span style="font-weight:400; font-size:9px;">{{ $period['start_date'] }} — {{ $period['end_date'] }}</span>
         </div>
       </td>
@@ -366,41 +370,36 @@
 {{-- ══════════════════════════════════════════════════
      SECTION 1 — RINGKASAN
 ══════════════════════════════════════════════════ --}}
-<div class="section-title">📊 Ringkasan Periode Ini</div>
+<div class="section-title">Ringkasan Periode Ini</div>
 
 <table style="width: 100%; border-collapse: collapse; border: 0; margin-bottom: 4px;">
   <tr>
     <td style="width: 20%; padding: 0 4px 0 0; border: 0;">
       <div class="summary-card card-pink">
-        <span class="emoji">🎮</span>
         <span class="value">{{ $summary['total_sessions'] }}</span>
         <span class="label">Sesi Main</span>
       </div>
     </td>
     <td style="width: 20%; padding: 0 4px; border: 0;">
       <div class="summary-card card-gold">
-        <span class="emoji">⏱️</span>
         <span class="value">{{ number_format($summary['total_play_minutes'], 1) }}</span>
         <span class="label">Menit Belajar</span>
       </div>
     </td>
     <td style="width: 20%; padding: 0 4px; border: 0;">
       <div class="summary-card card-teal">
-        <span class="emoji">🏆</span>
         <span class="value">{{ number_format($summary['avg_score'], 1) }}</span>
         <span class="label">Rata-rata Skor</span>
       </div>
     </td>
     <td style="width: 20%; padding: 0 4px; border: 0;">
       <div class="summary-card card-purple">
-        <span class="emoji">⭐</span>
         <span class="value">{{ $summary['earned_stars'] }}</span>
         <span class="label">Bintang</span>
       </div>
     </td>
     <td style="width: 20%; padding: 0 0 0 4px; border: 0;">
       <div class="summary-card card-green">
-        <span class="emoji">✅</span>
         <span class="value">{{ $summary['completion_rate'] }}%</span>
         <span class="label">Selesai</span>
       </div>
@@ -412,13 +411,13 @@
 {{-- ══════════════════════════════════════════════════
      SECTION 2 — GAYA BELAJAR VAK
 ══════════════════════════════════════════════════ --}}
-<div class="section-title">🧠 Gaya Belajar (Visual · Auditori · Kinestetik)</div>
+<div class="section-title">Gaya Belajar (Visual · Auditori · Kinestetik)</div>
 
 <div class="box">
 @if($learningStyle['has_data'])
   <table style="width: 100%; border-collapse: collapse; border: 0;">
     <tr>
-      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">👁️ Visual</td>
+      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">Visual</td>
       <td style="padding: 4px 0; border: 0; vertical-align: middle;">
         <div class="vak-track" style="display: block; width: 100%;">
           <div class="vak-fill fill-pink" style="width: {{ $learningStyle['visual'] }}%;"></div>
@@ -427,7 +426,7 @@
       <td style="width: 45px; text-align: right; font-size: 10px; font-weight: 900; color:#E91E8C; padding: 4px 0; border: 0;">{{ $learningStyle['visual'] }}%</td>
     </tr>
     <tr>
-      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">👂 Auditori</td>
+      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">Auditori</td>
       <td style="padding: 4px 0; border: 0; vertical-align: middle;">
         <div class="vak-track" style="display: block; width: 100%;">
           <div class="vak-fill fill-gold" style="width: {{ $learningStyle['auditory'] }}%;"></div>
@@ -436,7 +435,7 @@
       <td style="width: 45px; text-align: right; font-size: 10px; font-weight: 900; color:#d48900; padding: 4px 0; border: 0;">{{ $learningStyle['auditory'] }}%</td>
     </tr>
     <tr>
-      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">🤸 Kinestetik</td>
+      <td style="width: 90px; font-size: 10px; font-weight: 700; color: #444; padding: 4px 0; border: 0;">Kinestetik</td>
       <td style="padding: 4px 0; border: 0; vertical-align: middle;">
         <div class="vak-track" style="display: block; width: 100%;">
           <div class="vak-fill fill-teal" style="width: {{ $learningStyle['kinesthetic'] }}%;"></div>
@@ -446,11 +445,11 @@
     </tr>
   </table>
   <div style="margin-top:8px; font-size:10px; color:#888;">
-    💡 <em>Gaya belajar dominan anak: <strong class="highlight">{{ $learningStyle['dominant'] }}</strong></em>
+    Info: <em>Gaya belajar dominan anak: <strong class="highlight">{{ $learningStyle['dominant'] }}</strong></em>
   </div>
 @else
   <div class="vak-no-data">
-    🌱 Gaya belajar belum bisa dihitung. Butuh beberapa sesi selesai dengan skor dulu ya!
+    Gaya belajar belum bisa dihitung. Butuh beberapa sesi selesai dengan skor dulu ya!
   </div>
 @endif
 </div>
@@ -459,12 +458,13 @@
 {{-- ══════════════════════════════════════════════════
      SECTION 3 — AKTIVITAS HARIAN
 ══════════════════════════════════════════════════ --}}
-<div class="section-title">📅 Aktivitas Harian</div>
+<div class="section-title">Aktivitas Harian</div>
 
 <div class="box">
 @php
   $maxMin = collect($daily)->max('play_minutes') ?: 1;
   $barColors = ['#E91E8C','#F5A623','#0ABFBC','#7B4FBE','#27AE60','#E91E8C','#F5A623'];
+  $isMonthly = count($daily) > 7;
 @endphp
 
 <table style="width: 100%; border-collapse: collapse; border: 0; margin-bottom: 10px;">
@@ -473,15 +473,34 @@
     @php
       $heightPx = max(4, round(($day['play_minutes'] / $maxMin) * 50));
       $color = $day['play_minutes'] > 0 ? ($barColors[$i % 7]) : '#e0e0e0';
-      $dayName = \Carbon\Carbon::parse($day['date'])->locale('id')->isoFormat('ddd');
+      $parsedDate = \Carbon\Carbon::parse($day['date']);
+      $dayName = $parsedDate->locale('id')->isoFormat('ddd');
+      $dayNum = $parsedDate->day;
+
+      $showLabel = true;
+      $labelText = $dayName;
+
+      if ($isMonthly) {
+          if ($dayNum % 5 == 0 || $i == 0 || $i == count($daily) - 1) {
+              $labelText = $dayNum;
+          } else {
+              $showLabel = false;
+          }
+      }
     @endphp
     <td style="width: {{ 100 / count($daily) }}%; text-align: center; border: 0; padding: 0; vertical-align: bottom;">
       <div class="day-bar-wrap">
         <div class="day-bar" style="height:{{ $heightPx }}px; background:{{ $color }}; margin: 0 auto; display: block;"></div>
       </div>
-      <div class="day-label">{{ $dayName }}</div>
-      <div class="day-min" style="color:{{ $color }};">
-        @if($day['play_minutes'] > 0){{ number_format($day['play_minutes'],1) }}m@else-@endif
+      <div class="day-label" style="font-size: 8px;">
+        @if($showLabel)
+          {{ $labelText }}
+        @endif
+      </div>
+      <div class="day-min" style="color:{{ $color }}; font-size: 7px; height: 10px;">
+        @if(!$isMonthly && $day['play_minutes'] > 0)
+          {{ number_format($day['play_minutes'], 1) }}m
+        @endif
       </div>
     </td>
   @endforeach
@@ -506,7 +525,7 @@
   @endif
   @endforeach
   @if(collect($daily)->sum('sessions') == 0)
-  <tr><td colspan="4" class="empty-state">Belum ada aktivitas di periode ini 🌙</td></tr>
+  <tr><td colspan="4" class="empty-state">Belum ada aktivitas di periode ini</td></tr>
   @endif
 </table>
 </div>
@@ -515,7 +534,7 @@
 {{-- ══════════════════════════════════════════════════
      SECTION 4 — PER MODUL
 ══════════════════════════════════════════════════ --}}
-<div class="section-title">📚 Progress per Modul</div>
+<div class="section-title">Progress per Modul</div>
 
 @if(count($modules) > 0)
 <table class="data-table">
@@ -525,19 +544,11 @@
     <th style="text-align:center;">Selesai</th>
     <th style="text-align:center;">Durasi</th>
     <th style="text-align:center;">Skor Rata-rata</th>
-    <th style="text-align:center;">Bintang ⭐</th>
+    <th style="text-align:center;">Bintang</th>
   </tr>
   @foreach($modules as $mod)
-  @php
-    $moduleEmoji = [
-      'membaca'   => '📖',
-      'menulis'   => '✏️',
-      'berhitung' => '🔢',
-      'puzzle'    => '🧩',
-    ][$mod['module_slug']] ?? '📚';
-  @endphp
   <tr>
-    <td><strong>{{ $moduleEmoji }} {{ $mod['module_name'] }}</strong></td>
+    <td><strong>{{ $mod['module_name'] }}</strong></td>
     <td class="num">{{ $mod['total_sessions'] }}</td>
     <td class="num">{{ $mod['completed_sessions'] }}</td>
     <td class="num">{{ number_format($mod['total_play_minutes'],1) }} mnt</td>
@@ -547,7 +558,7 @@
   @endforeach
 </table>
 @else
-<div class="box"><div class="empty-state">Belum ada modul yang dimainkan di periode ini 🎮</div></div>
+<div class="box"><div class="empty-state">Belum ada modul yang dimainkan di periode ini</div></div>
 @endif
 
 
@@ -556,17 +567,10 @@
 ══════════════════════════════════════════════════ --}}
 <div class="page-break"></div>
 
-<div class="section-title">😊 Mood Anak di Periode Ini</div>
+<div class="section-title">Mood Anak di Periode Ini</div>
 
 <div class="box">
 @php
-  $moodEmoji = [
-    'senang'    => '😄',
-    'ceria'     => '🤩',
-    'takut'     => '😰',
-    'sedih'     => '😢',
-    'marah'     => '😡',
-  ];
   $moodLabel = [
     'senang'    => 'Senang',
     'ceria'     => 'Ceria',
@@ -583,7 +587,7 @@
   @foreach(['senang','ceria','takut','sedih','marah'] as $moodKey)
   @php $cnt = (int)($moodSummary[$moodKey] ?? 0); @endphp
   <div class="mood-chip chip-{{ $moodKey }}" style="{{ $cnt == 0 ? 'opacity:0.4' : '' }}">
-    {{ $moodEmoji[$moodKey] }} {{ $moodLabel[$moodKey] }}
+    {{ $moodLabel[$moodKey] }}:
     <strong>{{ $cnt }}x</strong>
   </div>
   @endforeach
@@ -601,7 +605,6 @@
     <td>{{ \Carbon\Carbon::parse($moodItem['date'])->locale('id')->isoFormat('dddd, D MMM YYYY') }}</td>
     <td class="muted">{{ $moodItem['time'] }}</td>
     <td>
-      {{ $moodEmoji[$moodItem['mood_type']] ?? '😐' }}
       <strong>{{ $moodLabel[$moodItem['mood_type']] ?? $moodItem['mood_type'] }}</strong>
     </td>
   </tr>
@@ -610,7 +613,7 @@
 @endif
 @else
 <div class="empty-state">
-  😶 Belum ada data mood di periode ini. Ajak si kecil cek mood setiap hari ya!
+  Belum ada data mood di periode ini. Ajak si kecil cek mood setiap hari ya!
 </div>
 @endif
 </div>
@@ -620,26 +623,26 @@
 ══════════════════════════════════════════════════ --}}
 <div class="page-break"></div>
 
-<div class="section-title">✨ Nusa AI Insights & Minat Si Kecil</div>
+<div class="section-title">Nusa AI Insights & Minat Si Kecil</div>
 <div class="box" style="background: #FFF9F2; border: 1.5px solid #F5DCA3;">
   <p style="font-size: 11px; color: #7B4FBE; font-weight: bold; margin-bottom: 8px;">
-    💡 Melalui obrolan interaktif dengan si kecil, Nusa mendeteksi beberapa ketertarikan berikut:
+    Melalui obrolan interaktif dengan si kecil, Nusa mendeteksi beberapa ketertarikan berikut:
   </p>
   <table style="width: 100%; border-collapse: collapse; border: 0; font-size: 10.5px;">
     <tr>
-      <td style="width: 130px; font-weight: bold; color: #444; padding: 4px 0; border: 0;">🚀 Cita-cita:</td>
+      <td style="width: 130px; font-weight: bold; color: #444; padding: 4px 0; border: 0;">Cita-cita:</td>
       <td style="color: #E91E8C; font-weight: bold; padding: 4px 0; border: 0;">
         {{ $child['cita_cita'] ? ucfirst($child['cita_cita']) : 'Belum terdeteksi (ajak si kecil ngobrol dengan Nusa)' }}
       </td>
     </tr>
     <tr>
-      <td style="font-weight: bold; color: #444; padding: 4px 0; border: 0;">🎨 Hobi:</td>
+      <td style="font-weight: bold; color: #444; padding: 4px 0; border: 0;">Hobi:</td>
       <td style="color: #7B4FBE; font-weight: bold; padding: 4px 0; border: 0;">
         {{ $child['hobi'] ? ucfirst($child['hobi']) : 'Belum terdeteksi' }}
       </td>
     </tr>
     <tr>
-      <td style="font-weight: bold; color: #444; padding: 4px 0; border: 0;">🍉 Makanan Favorit:</td>
+      <td style="font-weight: bold; color: #444; padding: 4px 0; border: 0;">Makanan Favorit:</td>
       <td style="color: #0ABFBC; font-weight: bold; padding: 4px 0; border: 0;">
         {{ $child['makanan_favorit'] ? ucfirst($child['makanan_favorit']) : 'Belum terdeteksi' }}
       </td>
@@ -647,7 +650,7 @@
   </table>
 </div>
 
-<div class="section-title">🎓 Rekomendasi Akademik Tumbuh Kembang</div>
+<div class="section-title">Rekomendasi Akademik Tumbuh Kembang</div>
 <div class="box" style="background: #F4FBF7; border: 1.5px solid #A3F5C7; margin-bottom: 12px;">
   <p style="font-size: 11px; font-weight: 900; color: #1e8a4a; margin-bottom: 6px; text-transform: uppercase;">
     Rekomendasi Berdasarkan Gaya Belajar Dominan ({{ $learningStyle['dominant'] }})
@@ -687,11 +690,10 @@
   @endif
 </div>
 
-
 {{-- ══════════════════════════════════════════════════
      SECTION 6 — DETAIL SESI
 ══════════════════════════════════════════════════ --}}
-<div class="section-title">🎮 Detail Sesi Bermain</div>
+<div class="section-title">Detail Sesi Bermain</div>
 
 @if(count($sessions) > 0)
 <table class="data-table sessions-table">
@@ -701,7 +703,7 @@
     <th>Level</th>
     <th style="text-align:center;">Durasi</th>
     <th style="text-align:center;">Skor</th>
-    <th style="text-align:center;">⭐</th>
+    <th style="text-align:center;">Bintang</th>
     <th style="text-align:center;">Progress</th>
     <th style="text-align:center;">Status</th>
   </tr>
@@ -716,24 +718,23 @@
     <td class="num muted">{{ $s['current_item'] }}/{{ $s['total_items'] }}</td>
     <td class="num">
       @if($s['status'] === 'completed')
-        <span class="badge badge-done">✅ Selesai</span>
+        <span class="badge badge-done">Selesai</span>
       @else
-        <span class="badge badge-partial">⏳ Lanjut</span>
+        <span class="badge badge-partial">Lanjut</span>
       @endif
     </td>
   </tr>
   @endforeach
 </table>
 @else
-<div class="box"><div class="empty-state">Belum ada sesi bermain di periode ini 🌙</div></div>
+<div class="box"><div class="empty-state">Belum ada sesi bermain di periode ini</div></div>
 @endif
-
 
 {{-- ══════════════════════════════════════════════════
      FOOTER
 ══════════════════════════════════════════════════ --}}
 <div class="footer">
-  Dibuat otomatis oleh <strong>Calista</strong> — Teman Belajar Si Kecil 🌟
+  Dibuat otomatis oleh <strong>Calista</strong> - Teman Belajar Si Kecil
   &nbsp;·&nbsp;
   {{ $printDate }}
   &nbsp;·&nbsp;

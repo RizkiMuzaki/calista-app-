@@ -878,13 +878,19 @@ class ProgressController extends Controller
                     : 0,
             ],
             'modules' => $moduleBreakdown,
-            'learning_style' => $this->_calculateLearningStyle($moduleBreakdown->map(function ($module) {
-                return [
-                    'module_slug' => $module['module_slug'],
-                    'avg_score' => $module['avg_score'],
-                    'completed' => $module['completed_sessions'],
-                ];
-            })->values()->all()),
+            'learning_style' => $this->_calculateLearningStyle(
+                $sessions->groupBy(function ($session) {
+                    return $session->level?->activity_type ?? 'unknown';
+                })->map(function ($items, $type) {
+                    $completed = $items->where('status', 'completed');
+                    $scoreItems = $completed->where('score', '>', 0);
+                    return [
+                        'module_slug' => $type,
+                        'avg_score' => $scoreItems->count() > 0 ? round($scoreItems->avg('score'), 1) : 0,
+                        'completed' => $completed->count(),
+                    ];
+                })->values()->all()
+            ),
             'daily' => $this->buildDailySessionBreakdown($sessions, $start, $end),
             'moods' => [
                 'summary' => $this->normalizeMoodSummary($moods->groupBy('mood_type')->map->count()),
@@ -1081,7 +1087,15 @@ class ProgressController extends Controller
                 ? 'Minggu ' . $start->isoFormat('D MMM') . ' – ' . $end->isoFormat('D MMM YYYY')
                 : 'Bulan '  . $start->isoFormat('MMMM YYYY');
 
+            // Load logo base64
+            $logoPath = public_path('images/logo/Calista_Logo.webp');
+            $logoBase64 = null;
+            if (file_exists($logoPath)) {
+                $logoBase64 = 'data:image/webp;base64,' . base64_encode(file_get_contents($logoPath));
+            }
+
             $viewData = [
+                'logoBase64'    => $logoBase64,
                 'child' => [
                     'nama'      => $anak->nama_anak,
                     'umur'      => $anak->tanggal_lahir ? $anak->tanggal_lahir->age : null,
