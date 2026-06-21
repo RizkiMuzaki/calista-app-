@@ -329,10 +329,9 @@
 ══════════════════════════════════════════════════ --}}
 <div style="text-align: center; margin-bottom: 20px; padding-top: 5px;">
   @if(!empty($logoBase64))
-    <img src="{{ $logoBase64 }}" style="height: 55px; display: inline-block; vertical-align: middle;">
+    <img src="{{ $logoBase64 }}" style="height: 95px; display: inline-block; vertical-align: middle;">
   @endif
-  <div style="font-size: 24px; font-weight: 900; letter-spacing: 3px; color: #E91E8C; margin-top: 6px;">CALISTA</div>
-  <div style="font-size: 10px; color: #7B4FBE; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; margin-top: 2px;">Laporan Belajar Anak</div>
+  <div style="font-size: 10px; color: #7B4FBE; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; margin-top: 8px;">Laporan Belajar Anak</div>
 </div>
 
 {{-- ══════════════════════════════════════════════════

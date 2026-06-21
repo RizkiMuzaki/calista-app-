@@ -66,7 +66,7 @@ class AdminReportController extends Controller
                 'modules'       => $moduleBreak->toArray(),
                 'daily'         => $daily,
                 'moods'         => [
-                    'summary' => (array) $payload['moods']['summary'],
+                    'summary' => $payload['moods']['summary'] instanceof \Illuminate\Support\Collection ? $payload['moods']['summary']->toArray() : (array) $payload['moods']['summary'],
                     'items'   => collect($payload['moods']['items'])->toArray(),
                 ],
                 'sessions'      => collect($payload['recent_sessions'])->toArray(),
@@ -157,7 +157,7 @@ class AdminReportController extends Controller
             ->whereBetween('created_at', [$start->copy()->startOfDay(), $end->copy()->endOfDay()])
             ->get();
 
-        $moodCounts = $moods->groupBy('mood')->map->count();
+        $moodCounts = $moods->groupBy('mood_type')->map->count();
         $dominantMood = $moodCounts->sortDesc()->keys()->first() ?? null;
 
         $visualCount      = $sessions->where('module_type', 'visual')->count();
@@ -184,10 +184,11 @@ class AdminReportController extends Controller
                 'kinesthetic' => $totalTyped > 0 ? round($kinestheticCount / $totalTyped * 100) : 0,
             ],
             'moods' => [
-                'summary' => ['dominant' => $dominantMood, 'total' => $moods->count()],
-                'items'   => $moods->take(10)->map(fn ($m) => [
-                    'mood'       => $m->mood,
-                    'created_at' => $m->created_at->locale('id')->isoFormat('D MMM'),
+                'summary' => $this->normalizeMoodSummary($moodCounts),
+                'items'   => $moods->sortByDesc('created_at')->take(20)->values()->map(fn ($m) => [
+                    'mood_type' => $m->mood_type,
+                    'date'      => $m->created_at->toDateString(),
+                    'time'      => $m->created_at->format('H:i'),
                 ])->toArray(),
             ],
             'recent_sessions' => $sessions->sortByDesc('played_on')->take(10)->map(fn ($s) => [
@@ -198,5 +199,11 @@ class AdminReportController extends Controller
                 'played_on' => $s->played_on,
             ])->values()->toArray(),
         ];
+    }
+
+    private function normalizeMoodSummary($summary)
+    {
+        $keys = ['senang', 'ceria', 'takut', 'sedih', 'marah'];
+        return collect($keys)->mapWithKeys(fn ($key) => [$key => (int) ($summary[$key] ?? 0)]);
     }
 }

@@ -1113,7 +1113,7 @@ class ProgressController extends Controller
                 'modules'       => $moduleBreak->toArray(),
                 'daily'         => $daily,
                 'moods'         => [
-                    'summary' => (array) $payload['moods']['summary'],
+                    'summary' => $payload['moods']['summary'] instanceof \Illuminate\Support\Collection ? $payload['moods']['summary']->toArray() : (array) $payload['moods']['summary'],
                     'items'   => collect($payload['moods']['items'])->toArray(),
                 ],
                 'sessions'      => collect($payload['recent_sessions'])->toArray(),
