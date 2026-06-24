@@ -2,8 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $anak_id
+ * @property int|null $level_id
+ * @property int|null $module_id
+ * @property string $session_uuid
+ * @property string $source
+ * @property string $module_slug
+ * @property string $module_name
+ * @property string $level_title
+ * @property string $status
+ * @property int $score
+ * @property int $current_score
+ * @property int $bintang
+ * @property int $current_item
+ * @property int $total_items
+ * @property int $mistakes
+ * @property int $lives_remaining
+ * @property int $duration_seconds
+ * @property \Illuminate\Support\Carbon|null $started_at
+ * @property \Illuminate\Support\Carbon|null $ended_at
+ * @property \Illuminate\Support\Carbon|null $played_on
+ * @property array|null $metadata
+ */
 class PlaySession extends Model
 {
     protected $fillable = [
