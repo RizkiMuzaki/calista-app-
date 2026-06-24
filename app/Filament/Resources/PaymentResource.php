@@ -43,10 +43,9 @@ class PaymentResource extends Resource
                             ->preload()
                             ->nullable(),
 
-                        Forms\Components\TextInput::make('reference')
+                        Forms\Components\TextInput::make('merchant_ref')
                             ->label('Referensi Transaksi')
                             ->disabled(),
-
                         Forms\Components\Select::make('provider')
                             ->label('Provider Pembayaran')
                             ->options([
@@ -130,7 +129,7 @@ class PaymentResource extends Resource
                         default   => 'gray',
                     }),
 
-                Tables\Columns\TextColumn::make('reference')
+                Tables\Columns\TextColumn::make('merchant_ref')
                     ->label('Referensi')
                     ->searchable()
                     ->copyable()
