@@ -92,13 +92,14 @@ class ModuleController extends Controller
 
             // Map levels untuk menambahkan properti is_locked dan progress
             $levels = $levels->map(function ($level, $index) use ($anakId, $canShowProgress, $hasActiveSub) {
-                // Level ke-3 ke atas (index >= 2) dikunci jika user bukan premium
-                $level->is_locked = !$hasActiveSub && ($index >= 2);
+                $isCompleted = false;
 
                 if ($canShowProgress) {
                     $progress = $level->progresAnaks()
                         ->where('anak_id', $anakId)
                         ->first();
+
+                    $isCompleted = $progress ? (bool)$progress->selesai : false;
 
                     $level->progress = $progress ? [
                         'score'   => $progress->score,
@@ -114,6 +115,9 @@ class ModuleController extends Controller
                 } else {
                     $level->progress = null;
                 }
+
+                // Level ke-3 ke atas (index >= 2) dikunci jika user bukan premium DAN level belum diselesaikan
+                $level->is_locked = !$hasActiveSub && ($index >= 2) && !$isCompleted;
 
                 return $level;
             });
@@ -171,10 +175,20 @@ class ModuleController extends Controller
                 $levels = $module->levels()->orderBy('order_number')->get();
                 $levelIndex = $levels->pluck('id')->search((int)$levelId);
                 if ($levelIndex !== false && $levelIndex >= 2) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Level ini adalah konten premium. Silakan berlangganan terlebih dahulu.'
-                    ], 403);
+                    $anakId = request()->query('anak_id');
+                    $isCompleted = false;
+                    if ($anakId && $user) {
+                        $isCompleted = \App\Models\ProgresAnak::where('anak_id', $anakId)
+                            ->where('level_id', $levelId)
+                            ->where('selesai', true)
+                            ->exists();
+                    }
+                    if (!$isCompleted) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Level ini adalah konten premium. Silakan berlangganan terlebih dahulu.'
+                        ], 403);
+                    }
                 }
             }
 

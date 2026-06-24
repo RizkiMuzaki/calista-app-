@@ -37,13 +37,39 @@ class VoiceAgentController extends Controller
         try {
             $user = auth()->user();
             
-            // 🆓 Blokir Akses Voice untuk User Free
-            $plan = $this->credits->planFor($user);
-            if ($plan['code'] === 'free') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Fitur Voice Tutor Nusa eksklusif untuk member Calista Plus. Yuk berlangganan!',
-                ], 403);
+            // 🆓 Batasan Harian Free Plan (15 turns)
+            $hasActiveSub = false;
+            if ($user) {
+                $hasActiveSub = \App\Models\Subscription::where('user_id', $user->id)
+                    ->active()
+                    ->exists();
+            }
+            $isFree = !$hasActiveSub;
+            $finalGoodbye = false;
+
+            if ($isFree) {
+                $today = now()->toDateString();
+                $cacheKey = 'free_chat_daily_count_' . ($user ? $user->id : 'guest') . '_' . $today;
+                $dailyCount = (int) Cache::get($cacheKey, 0);
+
+                if ($dailyCount > 15) {
+                    return response()->json([
+                        'success' => false,
+                        'limit_reached' => true,
+                        'message' => 'Batas obrolan gratis hari ini sudah habis. Sampai jumpa besok!',
+                    ], 403)
+                    ->header('X-AI-Free-Limit-Reached', 'true')
+                    ->header('X-AI-Daily-Remaining', '0')
+                    ->header('X-AI-Daily-Limit', '15')
+                    ->header('Access-Control-Expose-Headers', 'X-AI-Free-Limit-Reached,X-AI-Daily-Remaining,X-AI-Daily-Limit');
+                }
+
+                if ($dailyCount === 15) {
+                    $finalGoodbye = true;
+                    Cache::put($cacheKey, 16, now()->addDays(1));
+                } else {
+                    Cache::put($cacheKey, $dailyCount + 1, now()->addDays(1));
+                }
             }
 
             $ageGroup = $validated['age_group'] ?? '3-5';
@@ -51,6 +77,18 @@ class VoiceAgentController extends Controller
             $userText = $this->groq->transcribe($audioFile, 'id');
 
             if ($userText === '') {
+                // Rollback counter if transcription was empty
+                if ($isFree) {
+                    $today = now()->toDateString();
+                    $cacheKey = 'free_chat_daily_count_' . ($user ? $user->id : 'guest') . '_' . $today;
+                    $dailyCount = (int) Cache::get($cacheKey, 0);
+                    if ($dailyCount === 16) {
+                        Cache::put($cacheKey, 15, now()->addDays(1));
+                    } elseif ($dailyCount > 0) {
+                        Cache::put($cacheKey, $dailyCount - 1, now()->addDays(1));
+                    }
+                }
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Nusa belum mendengar suaramu. Coba bicara pelan-pelan ya.',
@@ -59,6 +97,34 @@ class VoiceAgentController extends Controller
             }
 
             $sessionId = $request->input('session_id', 'general');
+
+            if ($finalGoodbye) {
+                $childName = $request->input('child_name', 'teman kecil');
+                $aiResponse = "Sampai jumpa besok yaa " . $childName . ", atau minta Papa/Mama aktifkan Calista Plus ya!";
+                
+                $this->trackVoiceChatSession($user, null, $sessionId, $userText, $aiResponse, 16);
+                
+                $audio = $this->tts->synthesize($aiResponse, $user, 'voice_chat');
+                
+                if (!$audio['success']) {
+                    $currentDailyCount = $isFree ? (int) Cache::get($cacheKey, 0) : 0;
+                    $dailyRemaining = $isFree ? max(0, 15 - $currentDailyCount) : 999;
+                    return $this->creditFallback($aiResponse, $userText, $audio, $isFree, $dailyRemaining, 15);
+                }
+
+                return response($audio['audio'])
+                    ->header('Content-Type', $audio['content_type'])
+                    ->header('Cache-Control', 'no-cache, no-store')
+                    ->header('X-STT-Text', $this->safeHeader($userText))
+                    ->header('X-AI-Response', $this->safeHeader($aiResponse))
+                    ->header('X-Age-Group', $ageGroup)
+                    ->header('X-AI-Plan', 'free')
+                    ->header('X-AI-Free-Limit-Reached', 'true')
+                    ->header('X-AI-Daily-Remaining', '0')
+                    ->header('X-AI-Daily-Limit', '15')
+                    ->header('Access-Control-Expose-Headers', 'X-STT-Text,X-AI-Response,X-Age-Group,X-AI-Plan,X-AI-Free-Limit-Reached,X-AI-Daily-Remaining,X-AI-Daily-Limit');
+            }
+
             $context = $this->contextFromRequest($request, $ageGroup);
             $context['history'] = $this->historyFor($user?->id, $sessionId);
 
@@ -302,8 +368,14 @@ class VoiceAgentController extends Controller
             ], $sessionId);
 
             if (!$audio['success']) {
-                return $this->creditFallback($aiResponse, $userText, $audio);
+                $currentDailyCount = $isFree ? (int) Cache::get($cacheKey, 0) : 0;
+                $dailyRemaining = $isFree ? max(0, 15 - $currentDailyCount) : 999;
+                return $this->creditFallback($aiResponse, $userText, $audio, $isFree, $dailyRemaining, 15);
             }
+
+            $currentDailyCount = $isFree ? (int) Cache::get($cacheKey, 0) : 0;
+            $dailyRemaining = $isFree ? max(0, 15 - $currentDailyCount) : 999;
+            $dailyLimit = 15;
 
             return response($audio['audio'])
                 ->header('Content-Type', $audio['content_type'])
@@ -311,9 +383,11 @@ class VoiceAgentController extends Controller
                 ->header('X-STT-Text', $this->safeHeader($userText))
                 ->header('X-AI-Response', $this->safeHeader($aiResponse))
                 ->header('X-Age-Group', $ageGroup)
-                ->header('X-AI-Plan', $audio['credit']['plan'] ?? 'free')
+                ->header('X-AI-Plan', $isFree ? 'free' : 'premium')
                 ->header('X-AI-Credits-Remaining', (string) ($audio['credit']['remaining'] ?? 0))
-                ->header('Access-Control-Expose-Headers', 'X-STT-Text,X-AI-Response,X-Age-Group,X-AI-Plan,X-AI-Credits-Remaining');
+                ->header('X-AI-Daily-Remaining', (string) $dailyRemaining)
+                ->header('X-AI-Daily-Limit', (string) $dailyLimit)
+                ->header('Access-Control-Expose-Headers', 'X-STT-Text,X-AI-Response,X-Age-Group,X-AI-Plan,X-AI-Credits-Remaining,X-AI-Daily-Remaining,X-AI-Daily-Limit');
         } catch (\Throwable $e) {
             Log::error('Nusa voice pipeline failed', ['error' => $e->getMessage()]);
 
@@ -436,15 +510,66 @@ class VoiceAgentController extends Controller
         try {
             $user = auth()->user();
 
-            // 🆓 Blokir Akses Voice untuk User Free
-            $plan = $this->credits->planFor($user);
-            if ($plan['code'] === 'free') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Fitur Voice Tutor Nusa eksklusif untuk member Calista Plus. Yuk berlangganan!',
-                ], 403);
+            // 🆓 Batasan Harian Free Plan (15 turns)
+            $hasActiveSub = false;
+            if ($user) {
+                $hasActiveSub = \App\Models\Subscription::where('user_id', $user->id)
+                    ->active()
+                    ->exists();
             }
+            $isFree = !$hasActiveSub;
+            $finalGoodbye = false;
+
+            if ($isFree) {
+                $today = now()->toDateString();
+                $cacheKey = 'free_chat_daily_count_' . ($user ? $user->id : 'guest') . '_' . $today;
+                $dailyCount = (int) Cache::get($cacheKey, 0);
+
+                if ($dailyCount > 15) {
+                    return response()->json([
+                        'success' => false,
+                        'limit_reached' => true,
+                        'message' => 'Batas obrolan gratis hari ini sudah habis. Sampai jumpa besok!',
+                    ], 403)
+                    ->header('X-AI-Free-Limit-Reached', 'true')
+                    ->header('X-AI-Daily-Remaining', '0')
+                    ->header('X-AI-Daily-Limit', '15')
+                    ->header('Access-Control-Expose-Headers', 'X-AI-Free-Limit-Reached,X-AI-Daily-Remaining,X-AI-Daily-Limit');
+                }
+
+                if ($dailyCount === 15) {
+                    $finalGoodbye = true;
+                    Cache::put($cacheKey, 16, now()->addDays(1));
+                } else {
+                    Cache::put($cacheKey, $dailyCount + 1, now()->addDays(1));
+                }
+            }
+
             $ageGroup = $validated['age_group'] ?? '3-5';
+
+            if ($finalGoodbye) {
+                $childName = $request->input('child_name', 'teman kecil');
+                $aiResponse = "Sampai jumpa besok yaa " . $childName . ", atau minta Papa/Mama aktifkan Calista Plus ya!";
+                
+                $audio = $this->tts->synthesize($aiResponse, $user, 'text_chat');
+                
+                if (!$audio['success']) {
+                    $currentDailyCount = $isFree ? (int) Cache::get($cacheKey, 0) : 0;
+                    $dailyRemaining = $isFree ? max(0, 15 - $currentDailyCount) : 999;
+                    return $this->creditFallback($aiResponse, $validated['message'], $audio, $isFree, $dailyRemaining, 15);
+                }
+
+                return response($audio['audio'])
+                    ->header('Content-Type', $audio['content_type'])
+                    ->header('Cache-Control', 'no-cache, no-store')
+                    ->header('X-AI-Response', $this->safeHeader($aiResponse))
+                    ->header('X-AI-Plan', 'free')
+                    ->header('X-AI-Free-Limit-Reached', 'true')
+                    ->header('X-AI-Daily-Remaining', '0')
+                    ->header('X-AI-Daily-Limit', '15')
+                    ->header('Access-Control-Expose-Headers', 'X-AI-Response,X-AI-Plan,X-AI-Free-Limit-Reached,X-AI-Daily-Remaining,X-AI-Daily-Limit');
+            }
+
             $context = $this->contextFromRequest($request, $ageGroup);
             $context['history'] = $this->historyFor($user?->id);
             $aiResponse = $this->groq->chat($validated['message'], $context);
@@ -458,16 +583,24 @@ class VoiceAgentController extends Controller
             ]);
 
             if (!$audio['success']) {
-                return $this->creditFallback($aiResponse, $validated['message'], $audio);
+                $currentDailyCount = $isFree ? (int) Cache::get($cacheKey, 0) : 0;
+                $dailyRemaining = $isFree ? max(0, 15 - $currentDailyCount) : 999;
+                return $this->creditFallback($aiResponse, $validated['message'], $audio, $isFree, $dailyRemaining, 15);
             }
+
+            $currentDailyCount = $isFree ? (int) Cache::get($cacheKey, 0) : 0;
+            $dailyRemaining = $isFree ? max(0, 15 - $currentDailyCount) : 999;
+            $dailyLimit = 15;
 
             return response($audio['audio'])
                 ->header('Content-Type', $audio['content_type'])
                 ->header('Cache-Control', 'no-cache, no-store')
                 ->header('X-AI-Response', $this->safeHeader($aiResponse))
-                ->header('X-AI-Plan', $audio['credit']['plan'] ?? 'free')
+                ->header('X-AI-Plan', $isFree ? 'free' : 'premium')
                 ->header('X-AI-Credits-Remaining', (string) ($audio['credit']['remaining'] ?? 0))
-                ->header('Access-Control-Expose-Headers', 'X-AI-Response,X-AI-Plan,X-AI-Credits-Remaining');
+                ->header('X-AI-Daily-Remaining', (string) $dailyRemaining)
+                ->header('X-AI-Daily-Limit', (string) $dailyLimit)
+                ->header('Access-Control-Expose-Headers', 'X-AI-Response,X-AI-Plan,X-AI-Credits-Remaining,X-AI-Daily-Remaining,X-AI-Daily-Limit');
         } catch (\Throwable $e) {
             Log::error('Nusa text chat failed', ['error' => $e->getMessage()]);
 
@@ -503,6 +636,30 @@ class VoiceAgentController extends Controller
             'used' => $guard['used'],
             'remaining' => $guard['remaining'],
             'period_start' => $guard['period_start'],
+        ]);
+    }
+
+    public function dailyQuotaStatus(Request $request)
+    {
+        $user = auth()->user();
+        $hasActiveSub = false;
+        if ($user) {
+            $hasActiveSub = \App\Models\Subscription::where('user_id', $user->id)
+                ->active()
+                ->exists();
+        }
+        $isFree = !$hasActiveSub;
+        
+        $today = now()->toDateString();
+        $cacheKey = 'free_chat_daily_count_' . ($user ? $user->id : 'guest') . '_' . $today;
+        $dailyCount = (int) Cache::get($cacheKey, 0);
+
+        return response()->json([
+            'success' => true,
+            'is_free' => $isFree,
+            'limit' => 15,
+            'used' => $dailyCount,
+            'remaining' => max(0, 15 - $dailyCount),
         ]);
     }
 
@@ -639,7 +796,7 @@ class VoiceAgentController extends Controller
         }
     }
 
-    private function creditFallback(string $aiText, string $userText, array $audio)
+    private function creditFallback(string $aiText, string $userText, array $audio, bool $isFree = true, int $dailyRemaining = 15, int $dailyLimit = 15)
     {
         return response()->json([
             'success' => false,
@@ -652,6 +809,9 @@ class VoiceAgentController extends Controller
             'credit' => $audio['credit'] ?? null,
         ], 402)->header('X-AI-Response', $this->safeHeader($aiText))
             ->header('X-AI-Credit-Exhausted', 'true')
-            ->header('Access-Control-Expose-Headers', 'X-AI-Response,X-AI-Credit-Exhausted');
+            ->header('X-AI-Plan', $isFree ? 'free' : 'premium')
+            ->header('X-AI-Daily-Remaining', (string) $dailyRemaining)
+            ->header('X-AI-Daily-Limit', (string) $dailyLimit)
+            ->header('Access-Control-Expose-Headers', 'X-AI-Response,X-AI-Credit-Exhausted,X-AI-Plan,X-AI-Daily-Remaining,X-AI-Daily-Limit');
     }
 }

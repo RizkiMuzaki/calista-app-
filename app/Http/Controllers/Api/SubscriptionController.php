@@ -201,11 +201,89 @@ class SubscriptionController extends Controller
         return response()->json([
             'status' => 'success',
             'is_premium' => $subscription !== null,
+            'has_ever_subscribed' => $user->hasEverSubscribed(),
             'data' => $subscription ? [
                 'plan_name' => $subscription->plan->nama_paket,
                 'starts_at' => $subscription->tanggal_mulai,
                 'ends_at' => $subscription->tanggal_berakhir,
             ] : null,
+        ], 200);
+    }
+
+    /**
+     * GET /api/subscription/history
+     * Mendapatkan riwayat pembayaran/langganan user.
+     */
+    public function history(Request $request)
+    {
+        $user = $request->user();
+        
+        // 1. Ambil data payments riil
+        $payments = Payment::where('user_id', $user->id)
+            ->whereNotNull('plan_id')
+            ->with('plan')
+            ->latest()
+            ->get();
+
+        // 2. Ambil data subscriptions riil
+        $subscriptions = Subscription::where('user_id', $user->id)
+            ->with('plan')
+            ->latest('tanggal_mulai')
+            ->get();
+
+        $data = collect();
+
+        // Map payments riil
+        foreach ($payments as $payment) {
+            $data->push([
+                'id' => $payment->id,
+                'plan_name' => $payment->plan ? $payment->plan->nama_paket : 'Calista Plus',
+                'amount' => (int) $payment->amount,
+                'payment_method' => $payment->payment_name ?? 'QRIS',
+                'status' => $payment->status, // PAID, UNPAID, EXPIRED, FAILED
+                'status_display' => $payment->status_display,
+                'merchant_ref' => $payment->merchant_ref,
+                'pay_code' => $payment->pay_code,
+                'pay_url' => $payment->pay_url,
+                'checkout_url' => $payment->checkout_url,
+                'created_at' => $payment->created_at ? $payment->created_at->toIso8601String() : null,
+                'expired_time' => $payment->expired_time ? $payment->expired_time->toIso8601String() : null,
+                'is_virtual' => false,
+            ]);
+        }
+
+        // Cari subscriptions yang tidak terwakili oleh payment PAID
+        foreach ($subscriptions as $sub) {
+            $hasMatchingPaidPayment = $payments->contains(function ($payment) use ($sub) {
+                return $payment->plan_id == $sub->plan_id && $payment->status === 'PAID';
+            });
+
+            if (!$hasMatchingPaidPayment) {
+                $statusDisplay = $sub->tanggal_berakhir > now() ? 'Aktif' : 'Expired';
+                $data->push([
+                    'id' => 'virtual-' . $sub->id,
+                    'plan_name' => $sub->plan ? $sub->plan->nama_paket : 'Calista Plus',
+                    'amount' => $sub->plan ? (int) $sub->plan->harga_jual : 0,
+                    'payment_method' => 'Sistem (Aktivasi Manual)',
+                    'status' => 'PAID',
+                    'status_display' => 'Sudah Aktif (' . $statusDisplay . ')',
+                    'merchant_ref' => 'SUB-VIRTUAL-' . $sub->id,
+                    'pay_code' => null,
+                    'pay_url' => null,
+                    'checkout_url' => null,
+                    'created_at' => $sub->tanggal_mulai ? Carbon::parse($sub->tanggal_mulai)->toIso8601String() : ($sub->created_at ? $sub->created_at->toIso8601String() : null),
+                    'expired_time' => $sub->tanggal_berakhir ? Carbon::parse($sub->tanggal_berakhir)->toIso8601String() : null,
+                    'is_virtual' => true,
+                ]);
+            }
+        }
+
+        // Urutkan berdasarkan created_at descending
+        $sortedData = $data->sortByDesc('created_at')->values()->all();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $sortedData
         ], 200);
     }
 

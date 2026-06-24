@@ -124,6 +124,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             ->exists();
     }
 
+    /**
+     * Cek apakah user pernah memiliki riwayat langganan
+     */
+    public function hasEverSubscribed(): bool
+    {
+        return $this->subscriptions()->exists();
+    }
+
  
 
     /**

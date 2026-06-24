@@ -110,6 +110,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('subscription')->group(function () {
             Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
             Route::get('/status', [SubscriptionController::class, 'status']);
+            Route::get('/history', [SubscriptionController::class, 'history']);
         });
 
         // 🔐 Parental Gate API — Double Layer Security untuk pembelian
@@ -143,6 +144,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/stt', [\App\Http\Controllers\VoiceAgentController::class, 'speechToText']);
             Route::post('/chat', [\App\Http\Controllers\VoiceAgentController::class, 'textChat']);
             Route::get('/credits', [\App\Http\Controllers\VoiceAgentController::class, 'creditStatus']);
+            Route::get('/daily-quota', [\App\Http\Controllers\VoiceAgentController::class, 'dailyQuotaStatus']);
             Route::get('/history', [\App\Http\Controllers\VoiceAgentController::class, 'getHistory']);
             Route::delete('/history', [\App\Http\Controllers\VoiceAgentController::class, 'clearHistory']);
         });

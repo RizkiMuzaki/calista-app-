@@ -144,7 +144,7 @@ class ChildController extends Controller
 
             // Validasi premium avatar untuk user Free
             if (!empty($validated['avatar_path']) && $validated['avatar_path'] !== 'assets/images/avatar/free/free_avatar_1.png') {
-                if (!$request->user()->hasActiveSubscription()) {
+                if (!$request->user()->hasActiveSubscription() && !$request->user()->hasEverSubscribed()) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Pilihan avatar ini hanya untuk pengguna premium CALISTA.',
@@ -294,7 +294,7 @@ class ChildController extends Controller
 
             // Validasi premium avatar untuk user Free
             if (array_key_exists('avatar_path', $validated) && !empty($validated['avatar_path']) && $validated['avatar_path'] !== 'assets/images/avatar/free/free_avatar_1.png') {
-                if (!$request->user()->hasActiveSubscription()) {
+                if (!$request->user()->hasActiveSubscription() && !$request->user()->hasEverSubscribed()) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Pilihan avatar ini hanya untuk pengguna premium CALISTA.',
