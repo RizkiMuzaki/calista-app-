@@ -161,7 +161,7 @@ class VoiceAgentController extends Controller
 
             $context['extra_instructions'] = implode("\n", $extraInstructions);
 
-            $aiResponse = $this->groq->chat($userText, $context);         }
+            $aiResponse = $this->groq->chat($userText, $context);
 
             // Ekstrak entitas jika tag terdeteksi
             $entities = null;
