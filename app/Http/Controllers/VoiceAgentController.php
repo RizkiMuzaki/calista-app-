@@ -136,195 +136,32 @@ class VoiceAgentController extends Controller
             $moduleSlug = $context['module_slug'] ?? '';
             $moduleTitle = $context['module_title'] ?? '';
             $childName = $context['child_name'] ?? 'teman kecil';
+            $extraInstructions = [];
+            $isRecall = in_array(strtolower($moduleSlug), ['reading', 'writing', 'counting', 'puzzle']);
 
-            // Check if it's the reading recall chat session
-            if (strtolower($moduleSlug) === 'reading') {
-                $level = 1;
-                $lowerTitle = strtolower($moduleTitle);
-                if (str_contains($lowerTitle, 'suku kata') || str_contains($lowerTitle, 'level 2')) {
-                    $level = 2;
-                } elseif (str_contains($lowerTitle, 'menyusun kata') || str_contains($lowerTitle, 'level 3') || str_contains($lowerTitle, 'menyusun')) {
-                    $level = 3;
-                } elseif (str_contains($lowerTitle, 'membaca kata') || str_contains($lowerTitle, 'level 4')) {
-                    $level = 4;
-                } elseif (str_contains($lowerTitle, 'membaca nyaring') || str_contains($lowerTitle, 'level 5') || str_contains($lowerTitle, 'nyaring')) {
-                    $level = 5;
-                }
-
-                $responses = [
-                    1 => [
-                        1 => "Wah, bagus sekali! Coba ikuti Nusa mengeja kata SINGA ya! S-I-N-G-A. Ayo tirukan!",
-                        2 => "Pintar sekali! Sekarang coba eja kata GAJAH! G-A-J-A-H. Ayo tirukan!",
-                        3 => "Luar biasa hebat! Kamu berhasil menyelesaikan tantangan hari ini. Sekarang waktunya istirahat dulu ya. Sampai jumpa lagi, [Nama]!",
-                    ],
-                    2 => [
-                        1 => "Betul sekali! Yuk kita mengeja suku kata MO-NYET! M-O, N-Y-E-T, MONYET! Ayo tirukan ejaan Nusa!",
-                        2 => "Wah pintar! Sekarang coba eja suku kata ZE-BRA! Z-E, B-R-A, ZEBRA! Ayo tirukan!",
-                        3 => "Hebat banget! Kamu pahlawan suku kata hari ini. Nusa harus istirahat dulu ya. Sampai jumpa lagi!",
-                    ],
-                    3 => [
-                        1 => "Betul! Itu GAJAH! Yuk eja bersama Nusa: G-A-J-A-H. Ayo eja!",
-                        2 => "Hebat! Kalau hewan loreng oranye yang suaranya aummm, namanya apa ya?",
-                        3 => "Betul sekali! SINGA! S-I-N-G-A. Kamu hebat luar biasa hari ini! Nusa pamit istirahat dulu ya, dadah [Nama]!",
-                    ],
-                    4 => [
-                        1 => "Pintar! Hewan PANDA itu sangat imut ya. Kalau kata BUAYA, B-U-A-Y-A, BUAYA! Coba tirukan ejaan buaya!",
-                        2 => "Wah suara kamu jelas sekali! Sekarang coba eja kata SINGA! S-I-N-G-A. Ayo tirukan!",
-                        3 => "Horeee! Semua kata berhasil kamu eja dengan sangat baik. Nusa bangga sekali sama kamu! Nusa pamit tidur dulu ya, dadah!",
-                    ],
-                    5 => [
-                        1 => "Pintar! Sekarang coba eja kata MONYET! M-O-N-Y-E-T, MONYET! Ayo tirukan!",
-                        2 => "Hebat! Terakhir, yuk kita eja kata GAJAH! G-A-J-A-H. Ayo!",
-                        3 => "Yey! Kamu adalah juara membaca nyaring hari ini. Nusa bangga banget! Sekarang kita istirahat dulu ya, sampai jumpa lagi!",
-                    ],
-                ];
-
-                if ($turnCount > 3) {
-                    $aiResponse = "Nusa harus istirahat dulu ya. Sampai jumpa lagi, " . $childName . "!";
+            if ($isRecall) {
+                $extraInstructions[] = "Ini adalah sesi Tanya Nusa (Recall Practice/Evaluasi Belajar) setelah {$childName} menyelesaikan modul {$moduleTitle} pada level {$levelTitle}.";
+                $extraInstructions[] = "Aturan Evaluasi Jawaban Anak (Wajib Diikuti):";
+                $extraInstructions[] = "1. Menganalisis Jawaban: Periksa transkrip suara anak ('{$userText}') secara kritis terhadap pertanyaan Nusa sebelumnya.";
+                $extraInstructions[] = "2. Validasi Akurasi: Jika jawaban anak salah, ngawur, tidak nyambung, atau menyebutkan hal lain (misal: Nusa meminta mengeja Z-E-B-R-A tapi anak menjawab 'gajah'), kamu HARUS mendeteksi kesalahan tersebut. JANGAN memuji jawaban yang salah sebagai benar! Katakan dengan ramah dan sabar: 'Hmm, sepertinya itu kurang tepat sayang' atau 'Itu gajah ya, tapi coba tirukan ejaan Nusa untuk ZEBRA sekali lagi yuk...' dan bimbing anak kembali.";
+                $extraInstructions[] = "3. Sesi Singkat: Batasi sesi tanya jawab ini dalam maksimal 3 giliran (turn). Ini giliran ke-{$turnCount} dari 3.";
+                if ($turnCount >= 3) {
+                    $extraInstructions[] = "4. Penutupan Sesi: Karena ini giliran ke-3 (terakhir), berikan apresiasi hangat atas usaha belajarnya hari ini, ucapkan selamat tinggal secara lucu/manis karena Nusa mau tidur/istirahat, dan JANGAN memberikan pertanyaan baru lagi.";
                 } else {
-                    $aiResponse = $responses[$level][$turnCount] ?? "Hebat sekali!";
-                    $aiResponse = str_replace('[Nama]', $childName, $aiResponse);
-                }
-            } elseif (strtolower($moduleSlug) === 'writing') {
-                $level = 1;
-                $lowerTitle = strtolower($moduleTitle);
-                if (str_contains($lowerTitle, 'f - j') || str_contains($lowerTitle, 'level 2')) {
-                    $level = 2;
-                } elseif (str_contains($lowerTitle, 'k - o') || str_contains($lowerTitle, 'level 3')) {
-                    $level = 3;
-                } elseif (str_contains($lowerTitle, 'p - t') || str_contains($lowerTitle, 'level 4')) {
-                    $level = 4;
-                } elseif (str_contains($lowerTitle, 'u - z') || str_contains($lowerTitle, 'level 5')) {
-                    $level = 5;
-                }
-
-                $responses = [
-                    1 => [
-                        1 => "Wah hebat! Nusa mau ajak kamu eja kata APEL yang dimulai dari huruf A! Coba ikuti Nusa: A-P-E-L, APEL! Ayo tirukan!",
-                        2 => "Pintar sekali! Sekarang kita eja kata BEBEK ya dari huruf B! B-E-B-E-K, BEBEK! Coba tirukan!",
-                        3 => "Luar biasa! Kamu pintar sekali menulis dan mengeja hari ini. Sekarang waktunya istirahat ya, dadah [Nama]!",
-                    ],
-                    2 => [
-                        1 => "Betul! Yuk kita mengeja kata GAJAH dari huruf G! G-A-J-A-H, GAJAH! Coba tirukan ejaan Nusa!",
-                        2 => "Wah pintar! Sekarang coba eja kata IKAN dari huruf I! I-K-A-N, IKAN! Ayo tirukan!",
-                        3 => "Hebat banget! Menulis dan mengeja hari ini selesai. Nusa istirahat dulu ya. Sampai jumpa lagi!",
-                    ],
-                    3 => [
-                        1 => "Betul! Yuk kita mengeja kata MONYET dari huruf M! M-O-N-Y-E-T, MONYET! Ayo tirukan!",
-                        2 => "Wah suara kamu jelas sekali! Sekarang coba eja kata KUCING dari huruf K! K-U-C-I-N-G, KUCING! Ayo tirukan!",
-                        3 => "Horeee! Kamu hebat mengeja kata hari ini. Nusa bangga banget! Nusa pamit tidur dulu ya, dadah!",
-                    ],
-                    4 => [
-                        1 => "Wah hebat! Nusa mau tes kamu mengeja kata PANDA dari huruf P. Coba ikuti Nusa: P-A-N-D-A, PANDA! Ayo eja!",
-                        2 => "Pintar! Sekarang coba eja kata SINGA dari huruf S! S-I-N-G-A, SINGA! Ayo tirukan!",
-                        3 => "Luar biasa! Menulis dan mengeja kata hari ini sangat seru. Sekarang kita istirahat dulu ya, sampai jumpa lagi!",
-                    ],
-                    5 => [
-                        1 => "Luar biasa! Nusa mau mengajak kamu mengeja kata ZEBRA dari huruf Z. Coba tirukan Nusa: Z-E-B-R-A, ZEBRA! Ayo tirukan!",
-                        2 => "Wah pintar! Terakhir, yuk kita eja kata ULAR dari huruf U! U-L-A-R, ULAR! Ayo tirukan!",
-                        3 => "Yey! Semua huruf dan kata sudah berhasil kamu pelajari hari ini. Nusa bangga sekali! Kita istirahat dulu ya, sampai jumpa lagi!",
-                    ],
-                ];
-
-                if ($turnCount > 3) {
-                    $aiResponse = "Nusa harus istirahat dulu ya. Sampai jumpa lagi, " . $childName . "!";
-                } else {
-                    $aiResponse = $responses[$level][$turnCount] ?? "Hebat sekali!";
-                    $aiResponse = str_replace('[Nama]', $childName, $aiResponse);
-                }
-            } elseif (strtolower($moduleSlug) === 'counting') {
-                $level = 1;
-                $lowerTitle = strtolower($moduleTitle);
-                if (str_contains($lowerTitle, 'teman baru') || str_contains($lowerTitle, 'level 2')) {
-                    $level = 2;
-                } elseif (str_contains($lowerTitle, 'kandang ramai') || str_contains($lowerTitle, 'level 3')) {
-                    $level = 3;
-                } elseif (str_contains($lowerTitle, 'barisan besar') || str_contains($lowerTitle, 'level 4')) {
-                    $level = 4;
-                } elseif (str_contains($lowerTitle, 'pesta kandang') || str_contains($lowerTitle, 'level 5')) {
-                    $level = 5;
-                }
-
-                $responses = [
-                    1 => [
-                        1 => "Pintar! Itu monyet dan panda! Sekarang coba hitung jari tanganmu bersama Nusa yuk. Satu, dua, tiga, empat, lima! Jari tangan kita ada berapa, [Nama]?",
-                        2 => "Hebat sekali! Betul, ada lima jari tangan! Kalau suara singa itu aummm atau cit-cit ya?",
-                        3 => "Wah benar, suaranya aummm! Kamu sangat pintar dan cerdas hari ini. Sekarang Nusa istirahat dulu ya. Sampai jumpa lagi, [Nama]!",
-                    ],
-                    2 => [
-                        1 => "Betul, itu panda! Nusa mau tanya dong, gajah berbelalai panjang yang kita hitung tadi warnanya apa ya? Abu-abu atau merah?",
-                        2 => "Pintar sekali, warnanya abu-abu! Sekarang yuk kita berhitung bersama Nusa: satu, dua, tiga! Coba sebutkan angka setelah angka tiga?",
-                        3 => "Hebat! Angka empat! Kamu sungguh cerdas berhitung hari ini. Nusa istirahat dulu ya, dadah!",
-                    ],
-                    3 => [
-                        1 => "Tepat sekali, ada tiga monyet! Kalau harimau yang belang-belang oranye itu ada berapa yang kita masukkan tadi? Tiga atau lima ya?",
-                        2 => "Betul, ada lima harimau! Monyet suka makan pisang, kalau harimau suka melompat-lompat ya. Kamu hebat! Angka kesukaanmu angka berapa?",
-                        3 => "Angka yang bagus! Kamu pahlawan angka yang luar biasa hari ini. Nusa pamit istirahat dulu ya, sampai jumpa lagi!",
-                    ],
-                    4 => [
-                        1 => "Betul sekali, beruang besar! Nusa mau tes kamu: kalau kita punya dua apel, lalu diberi satu apel lagi, sekarang ada berapa apel ya?",
-                        2 => "Wah, luar biasa pintar! Tiga apel! Sekarang coba sebutkan suara kudanil yang gemuk itu bagaimana ya?",
-                        3 => "Hahaha, lucu sekali suaranya! Kamu sangat hebat hari ini. Sekarang waktunya kita istirahat dulu ya. Dadah!",
-                    ],
-                    5 => [
-                        1 => "Betul sekali, jerapah leher panjang! Jerapah suka makan daun di pohon yang tinggi. Coba sebutkan warna daun itu warna apa ya?",
-                        2 => "Pintar! Warna hijau! Sekarang coba hitung kaki jerapah ada berapa? Satu, dua, tiga, empat! Ada berapa kaki jerapah?",
-                        3 => "Betul, empat kaki! Kamu juara berhitung kebanggaan Nusa hari ini! Sekarang kita istirahat dulu ya, dadah [Nama]!",
-                    ],
-                ];
-
-                if ($turnCount > 3) {
-                    $aiResponse = "Nusa harus istirahat dulu ya. Sampai jumpa lagi, " . $childName . "!";
-                } else {
-                    $aiResponse = $responses[$level][$turnCount] ?? "Hebat sekali!";
-                    $aiResponse = str_replace('[Nama]', $childName, $aiResponse);
-                }
-            } elseif (strtolower($moduleSlug) === 'puzzle') {
-                $level = 1;
-                $lowerTitle = strtolower($levelTitle ?? $moduleTitle ?? '');
-                if (str_contains($lowerTitle, 'teman kebun') || str_contains($lowerTitle, 'level 2')) {
-                    $level = 2;
-                } elseif (str_contains($lowerTitle, 'petualangan') || str_contains($lowerTitle, 'level 3')) {
-                    $level = 3;
-                }
-
-                $responses = [
-                    1 => [
-                        1 => "Betul sekali, singa! Wah, suaranya aummm kencang sekali ya! Sekarang Nusa mau tanya, kalau penguin yang jalannya lucu itu suka tinggal di tempat yang dingin sekali atau panas ya?",
-                        2 => "Pintar! Di tempat yang dingin dan bersalju! Wah, kamu hebat banget, [Nama]. Sekarang yuk ikuti Nusa menyebut kata ZOO! Z-O-O, ZOO! Coba tirukan!",
-                        3 => "Luar biasa hebat! Kamu berhasil menyusun dan menjawab semua tebakan Nusa hari ini. Sekarang waktunya istirahat dulu ya. Sampai jumpa lagi, [Nama]!",
-                    ],
-                    2 => [
-                        1 => "Tepat sekali, gajah! Gajah itu badannya besar sekali ya. Kalau telinga gajah itu lebar atau kecil ya?",
-                        2 => "Pintar! Telinga gajah sangat lebar untuk mengibas lalat. Sekarang coba ikuti Nusa mengeja kata ZEBRA! Z-E-B-R-A, ZEBRA! Ayo tirukan!",
-                        3 => "Hebat banget! Kamu juara menyusun puzzle hari ini. Nusa pamit istirahat dulu ya. Sampai jumpa lagi!",
-                    ],
-                    3 => [
-                        1 => "Betul sekali! Monyet suka makan buah pisang yang manis. Kalau harimau loreng yang giginya tajam itu suka makan rumput atau daging ya?",
-                        2 => "Wah pintar sekali! Harimau suka makan daging karena dia hewan yang kuat. Sekarang coba tirukan Nusa mengeja kata PANDA! P-A-N-D-A, PANDA! Ayo!",
-                        3 => "Horeee! Semua tebakan Nusa berhasil kamu jawab dengan benar. Kamu anak hebat kebanggaan Nusa! Sekarang kita istirahat dulu ya, dadah!",
-                    ],
-                ];
-
-                if ($turnCount > 3) {
-                    $aiResponse = "Nusa harus istirahat dulu ya. Sampai jumpa lagi, " . $childName . "!";
-                } else {
-                    $aiResponse = $responses[$level][$turnCount] ?? "Hebat sekali!";
-                    $aiResponse = str_replace('[Nama]', $childName, $aiResponse);
+                    $extraInstructions[] = "4. Pertanyaan Lanjutan: Berikan tebakan atau bimbingan mengeja kata/konsep berikutnya yang relevan dengan level {$levelTitle} secara singkat.";
                 }
             } else {
-                $extraInstructions = [];
                 if ($turnCount >= 5) {
-                    $extraInstructions[] = "Ini adalah giliran terakhir. Ucapkan kalimat perpisahan yang hangat dan katakan bahwa kamu (Nusa) harus tidur/istirahat sekarang. Jangan memberikan pertanyaan baru lagi.";
+                    $extraInstructions[] = "Ini adalah giliran terakhir (giliran ke-5). Ucapkan kalimat perpisahan yang hangat dan katakan bahwa kamu (Nusa) harus tidur/istirahat sekarang. Jangan memberikan pertanyaan baru lagi.";
                 }
-
-                // 📈 Integrasi Entity Extraction & Penyimpanan Profil Anak
-                $extraInstructions[] = "Ekstraksi Minat Anak: Jika anak menyebutkan cita-citanya (seperti dokter, astronot, tentara, dll), hobinya (seperti berenang, menggambar, bersepeda, dll), atau makanan kesukaannya (seperti sayur bening, fried chicken, dll), tambahkan tag berikut di akhir jawabanmu: <profile_entities>{\"cita_cita\": \"cita-cita yang terdeteksi atau null\", \"hobi\": \"hobi yang terdeteksi or null\", \"makanan\": \"makanan kesukaan yang terdeteksi atau null\"}</profile_entities>. Jika tidak ada yang terdeteksi, jangan tambahkan tag tersebut.";
-
-                $context['extra_instructions'] = implode("\n", $extraInstructions);
-
-                $aiResponse = $this->groq->chat($userText, $context);
             }
+
+            // 📈 Integrasi Entity Extraction & Penyimpanan Profil Anak
+            $extraInstructions[] = "Ekstraksi Minat Anak: Jika anak menyebutkan cita-citanya (seperti dokter, astronot, tentara, dll), hobinya (seperti berenang, menggambar, bersepeda, dll), atau makanan kesukaannya (seperti sayur bening, fried chicken, dll), tambahkan tag berikut di akhir jawabanmu: <profile_entities>{\"cita_cita\": \"cita-cita yang terdeteksi atau null\", \"hobi\": \"hobi yang terdeteksi or null\", \"makanan\": \"makanan kesukaan yang terdeteksi atau null\"}</profile_entities>. Jika tidak ada yang terdeteksi, jangan tambahkan tag tersebut.";
+
+            $context['extra_instructions'] = implode("\n", $extraInstructions);
+
+            $aiResponse = $this->groq->chat($userText, $context);         }
 
             // Ekstrak entitas jika tag terdeteksi
             $entities = null;

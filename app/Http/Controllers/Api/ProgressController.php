@@ -832,8 +832,8 @@ class ProgressController extends Controller
         }
 
         return [
-            $date->copy()->startOfWeek(Carbon::MONDAY),
-            $date->copy()->endOfWeek(Carbon::SUNDAY),
+            $date->copy()->startOfWeek(\Carbon\Carbon::MONDAY),
+            $date->copy()->endOfWeek(\Carbon\Carbon::SUNDAY),
             'week',
         ];
     }
@@ -996,7 +996,7 @@ class ProgressController extends Controller
                 ], 403);
             }
 
-            $perPage = $request->get('per_page', 15);
+            $perPage = $request->input('per_page', 15);
             $history = ProgresAnak::where('anak_id', $childId)
                 ->with(['level.module'])
                 ->orderBy('updated_at', 'desc')

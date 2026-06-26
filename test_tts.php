@@ -47,7 +47,7 @@ $body = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 $curlError = curl_error($ch);
-curl_close($ch);
+unset($ch); // curl_close() deprecated in PHP 8.5+
 
 echo "HTTP Status: {$httpCode}" . PHP_EOL;
 echo "Content-Type: {$contentType}" . PHP_EOL;
@@ -79,7 +79,7 @@ curl_setopt_array($ch2, [
 ]);
 $groqBody = curl_exec($ch2);
 $groqCode = curl_getinfo($ch2, CURLINFO_HTTP_CODE);
-curl_close($ch2);
+unset($ch2); // curl_close() deprecated in PHP 8.5+
 
 echo "Groq Status: {$groqCode}" . PHP_EOL;
 if ($groqCode === 200) {
