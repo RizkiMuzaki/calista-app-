@@ -136,6 +136,7 @@ class VoiceAgentController extends Controller
             $moduleSlug = $context['module_slug'] ?? '';
             $moduleTitle = $context['module_title'] ?? '';
             $childName = $context['child_name'] ?? 'teman kecil';
+            $levelTitle = $context['level_title'] ?? '';
             $extraInstructions = [];
             $isRecall = in_array(strtolower($moduleSlug), ['reading', 'writing', 'counting', 'puzzle']);
 
